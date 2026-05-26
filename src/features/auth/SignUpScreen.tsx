@@ -1,19 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
-import React from 'react'
+import {useState} from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { signUp } from './authService'
-import { signUpSchema, type SignUpInput } from './authSchema'
+import { signSchema, type SignInput } from './authSchema'
 
 const SignUpScreen = () => {
-  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignUpInput>({
-    resolver: zodResolver(signUpSchema),
+  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignInput>({
+    resolver: zodResolver(signSchema),
     defaultValues: { email: '', password: '' },
   })
-  const [errorText, setErrorText] = React.useState<string | null>(null)
+  const [errorText, setErrorText] = useState<string | null>(null)
 
-  const onSubmit = async (data: SignUpInput) => {
+  const onSubmit = async (data: SignInput) => {
     setErrorText(null)
     try {
       const result = await signUp(data.email, data.password)

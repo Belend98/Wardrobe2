@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CLOTHES_CATEGORIES } from './clothesCategories'
 
 export const createClotheSchema = z.object({
   name: z.string().trim().min(2, 'Nom trop court').max(80, 'Nom trop long'),
@@ -15,6 +16,7 @@ export const createClotheSchema = z.object({
       'URI image invalide',
     ),
   color: z.string().trim().max(40, 'Couleur trop longue').optional(),
+  category: z.enum(CLOTHES_CATEGORIES, { message: 'Categorie invalide' }),
   description: z.string().trim().max(500, 'Description trop longue').optional(),
   isPublic: z.boolean(),
 })

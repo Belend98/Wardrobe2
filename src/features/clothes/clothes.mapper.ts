@@ -4,6 +4,7 @@ export type ClothesRow = {
   id: string
   user_id: string
   name: string
+  category: string | null
   color: string | null
   image_url: string
   description: string | null
@@ -17,6 +18,7 @@ export function mapRowToModel(row: ClothesRow): ClothesModel {
     id: row.id,
     userId: row.user_id,
     name: row.name,
+    category: row.category,
     color: row.color,
     imageUrl: row.image_url,
     description: row.description,

@@ -2,6 +2,7 @@ export interface ClothesModel {
   id: string
   userId: string
   name: string
+  category?: string | null
   color?: string | null
   imageUrl: string
   description?: string | null

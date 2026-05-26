@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const signUpSchema = z.object({
+export const signSchema = z.object({
   email: z.email('Adresse email invalide').trim(),
   password: z
     .string()
@@ -8,7 +8,6 @@ export const signUpSchema = z.object({
     .max(72, 'Le mot de passe est trop long'),
 })
 
-export type SignUpInput = z.infer<typeof signUpSchema>
+export type SignInput = z.infer<typeof signSchema>
 
-export const signInSchema = signUpSchema
-export type SignInInput = z.infer<typeof signInSchema>
+

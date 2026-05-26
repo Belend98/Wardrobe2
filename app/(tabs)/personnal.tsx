@@ -1,18 +1,27 @@
 import type { ClothesModel } from '@/shared/model/clothesModel'
 import { signOut } from '@/src/features/auth/authService'
 import ClotheCard from '@/src/features/clothes/component/ClotheCard'
+import { CLOTHES_CATEGORIES, CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
 import { deleteMyClothe, getMyClothes } from '@/src/features/clothes/clothesService'
-import { getCurrentUserProfileOrThrow } from '@/src/features/user/userService'
+import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
+import { deleteCurrentUserAccountData, getCurrentUserProfileOrThrow } from '@/src/features/user/userService'
 import { router } from 'expo-router'
 import React from 'react'
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Alert, FlatList, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
 
 export default function PersonnalScreen() {
+  const { width } = useWindowDimensions()
+  const gridColumns = width < 900 ? 1 : Math.max(4, Math.min(6, Math.floor((width - 40) / 170)))
   const [isSigningOut, setIsSigningOut] = React.useState(false)
+  const [isDeletingAccount, setIsDeletingAccount] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(true)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
   const [clothes, setClothes] = React.useState<ClothesModel[]>([])
+  const [categoryFilter, setCategoryFilter] = React.useState<string>(CLOTHES_CATEGORY_ALL)
+  const { getCardEngagementProps } = useClotheEngagement(clothes, {
+    onError: (message) => Alert.alert('Erreur', message),
+  })
   const [profile, setProfile] = React.useState<{
     username: string
     bio: string | null
@@ -81,6 +90,38 @@ export default function PersonnalScreen() {
     }
   }
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Supprimer le compte',
+      'Cette action est definitive et supprimera tes donnees (profil, vetements, amis). Continuer ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsDeletingAccount(true)
+              await deleteCurrentUserAccountData()
+              try {
+                await signOut()
+              } catch {
+                // La session peut deja etre invalide apres suppression dans auth.users.
+              }
+              Alert.alert('Compte supprime', 'Ton compte a ete supprime.')
+              router.replace('/(auth)/signup')
+            } catch (error) {
+              const message = error instanceof Error ? error.message : 'Impossible de supprimer le compte.'
+              Alert.alert('Erreur', message)
+            } finally {
+              setIsDeletingAccount(false)
+            }
+          },
+        },
+      ],
+    )
+  }
+
   const confirmDelete = (id: string) => {
     Alert.alert('Supprimer', 'Confirmer la suppression de ce vetement ?', [
       { text: 'Annuler', style: 'cancel' },
@@ -110,7 +151,11 @@ export default function PersonnalScreen() {
       onDelete={confirmDelete}
       onEdit={(id) => router.push({ pathname: '/clothes/[id]/edit', params: { id } })}
       isDeleting={deletingId === item.id}
+      {...getCardEngagementProps(item.id)}
     />
+  )
+  const filteredClothes = clothes.filter(
+    (item) => categoryFilter === CLOTHES_CATEGORY_ALL || item.category === categoryFilter,
   )
 
   return (
@@ -138,8 +183,33 @@ export default function PersonnalScreen() {
               {isSigningOut ? 'Deconnexion...' : 'Se deconnecter'}
             </Text>
           </Pressable>
+          <Pressable
+            onPress={handleDeleteAccount}
+            disabled={isDeletingAccount}
+            style={[styles.deleteAccountButton, isDeletingAccount ? styles.buttonDisabled : undefined]}
+          >
+            <Text style={styles.deleteAccountButtonText}>
+              {isDeletingAccount ? 'Suppression...' : 'Supprimer compte'}
+            </Text>
+          </Pressable>
         </View>
         <Text style={styles.subtitle}>Tous tes vetements publies.</Text>
+        <View style={styles.filterWrap}>
+          {[CLOTHES_CATEGORY_ALL, ...CLOTHES_CATEGORIES].map((category) => {
+            const selected = categoryFilter === category
+            return (
+              <Pressable
+                key={category}
+                onPress={() => setCategoryFilter(category)}
+                style={[styles.filterChip, selected ? styles.filterChipActive : undefined]}
+              >
+                <Text style={[styles.filterChipText, selected ? styles.filterChipTextActive : undefined]}>
+                  {category}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
         <View style={styles.profileCard}>
           <View style={styles.profileHeader}>
             <Text style={styles.profileTitle}>Mon profil</Text>
@@ -168,10 +238,13 @@ export default function PersonnalScreen() {
         </View>
       ) : (
         <FlatList
-          data={clothes}
+          key={`personnal-grid-${gridColumns}`}
+          data={filteredClothes}
+          numColumns={gridColumns}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
+          columnWrapperStyle={gridColumns > 1 ? styles.gridRow : undefined}
           refreshing={isRefreshing}
           onRefresh={handleRefresh}
           ListEmptyComponent={
@@ -188,7 +261,7 @@ export default function PersonnalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F5F5F4',
   },
   header: {
     paddingHorizontal: 20,
@@ -269,9 +342,38 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 12,
   },
+  filterWrap: {
+    marginTop: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  filterChip: {
+    borderWidth: 1,
+    borderColor: '#D6D3D1',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#FFFFFF',
+  },
+  filterChipActive: {
+    borderColor: '#0F766E',
+    backgroundColor: '#F0FDFA',
+  },
+  filterChipText: {
+    color: '#44403C',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  filterChipTextActive: {
+    color: '#115E59',
+  },
   listContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
+    gap: 12,
+  },
+  gridRow: {
     gap: 12,
   },
   centerState: {
@@ -308,6 +410,18 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  deleteAccountButton: {
+    height: 36,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#B91C1C',
+    paddingHorizontal: 12,
+  },
+  deleteAccountButtonText: {
     color: '#FFFFFF',
     fontWeight: '700',
   },

@@ -4,20 +4,20 @@ import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { signIn } from './authService'
-import { signInSchema, type SignInInput } from './authSchema'
+import { signSchema, type SignInput } from './authSchema'
 
 const SignInScreen = () => {
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignInInput>({
-    resolver: zodResolver(signInSchema),
+  } = useForm<SignInput>({
+    resolver: zodResolver(signSchema),
     defaultValues: { email: '', password: '' },
   })
   const [errorText, setErrorText] = React.useState<string | null>(null)
 
-  const onSubmit = async (data: SignInInput) => {
+  const onSubmit = async (data: SignInput) => {
     setErrorText(null)
     try {
       await signIn(data.email, data.password)

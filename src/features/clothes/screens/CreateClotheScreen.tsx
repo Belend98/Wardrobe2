@@ -15,6 +15,7 @@ import {
 import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
 import { createMyClothe } from '../clothesService'
 import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
+import { CLOTHES_CATEGORIES } from '../clothesCategories'
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -57,6 +58,7 @@ const CreateClotheScreen = () => {
     defaultValues: {
       name: '',
       imageUrl: '',
+      category: 'T-shirt',
       color: '',
       description: '',
       isPublic: true,
@@ -98,6 +100,7 @@ const CreateClotheScreen = () => {
         name: data.name,
         imageUrl: data.imageUrl,
         imageBase64,
+        category: data.category,
         color: data.color?.trim() ? data.color : null,
         description: data.description?.trim() ? data.description : null,
         isPublic: data.isPublic,
@@ -161,7 +164,9 @@ const CreateClotheScreen = () => {
         )}
       />
       {errors.imageUrl ? <Text style={styles.errorText}>{errors.imageUrl.message}</Text> : null}
-      {imageUri ? <Image source={{ uri: imageUri }} style={styles.previewImage} /> : null}
+      {imageUri ? (
+        <Image source={{ uri: imageUri }} style={styles.previewImage} resizeMethod="resize" />
+      ) : null}
 
       <Text style={styles.label}>Couleur (optionnel)</Text>
       <Controller
@@ -178,6 +183,31 @@ const CreateClotheScreen = () => {
         )}
       />
       {errors.color ? <Text style={styles.errorText}>{errors.color.message}</Text> : null}
+
+      <Text style={styles.label}>Categorie</Text>
+      <Controller
+        control={control}
+        name="category"
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.categoryWrap}>
+            {CLOTHES_CATEGORIES.map((category) => {
+              const selected = value === category
+              return (
+                <Pressable
+                  key={category}
+                  onPress={() => onChange(category)}
+                  style={[styles.categoryChip, selected ? styles.categoryChipActive : undefined]}
+                >
+                  <Text style={[styles.categoryChipText, selected ? styles.categoryChipTextActive : undefined]}>
+                    {category}
+                  </Text>
+                </Pressable>
+              )
+            })}
+          </View>
+        )}
+      />
+      {errors.category ? <Text style={styles.errorText}>{errors.category.message}</Text> : null}
 
       <Text style={styles.label}>Description (optionnel)</Text>
       <Controller
@@ -288,6 +318,32 @@ const styles = StyleSheet.create({
   multiline: {
     minHeight: 90,
     textAlignVertical: 'top',
+  },
+  categoryWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 14,
+  },
+  categoryChip: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#FFFFFF',
+  },
+  categoryChipActive: {
+    borderColor: '#0F766E',
+    backgroundColor: '#F0FDFA',
+  },
+  categoryChipText: {
+    color: '#374151',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  categoryChipTextActive: {
+    color: '#115E59',
   },
   switchRow: {
     marginTop: 2,

@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker'
+import { Platform } from 'react-native'
 import type { PickedMedia } from './camera.types'
 
 function mapAsset(asset: ImagePicker.ImagePickerAsset): PickedMedia {
@@ -36,7 +37,7 @@ export async function pickImageFromLibrary() {
     mediaTypes: ['images'],
     allowsEditing: true,
     quality: 0.8,
-    base64: true,
+    base64: false,
   })
 
   if (result.canceled || !result.assets?.length) {
@@ -52,9 +53,9 @@ export async function takePhotoWithCamera() {
 
   const result = await ImagePicker.launchCameraAsync({
     mediaTypes: ['images'],
-    allowsEditing: true,
-    quality: 0.8,
-    base64: true,
+    allowsEditing: Platform.OS === 'ios',
+    quality: 0.6,
+    base64: false,
   })
 
   if (result.canceled || !result.assets?.length) {

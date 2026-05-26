@@ -16,6 +16,11 @@ import {
 import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
 import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
 import { getMyClotheById, updateMyClothe } from '../clothesService'
+import { CLOTHES_CATEGORIES } from '../clothesCategories'
+
+function isClothesCategory(value: unknown): value is CreateClotheInput['category'] {
+  return typeof value === 'string' && CLOTHES_CATEGORIES.includes(value as (typeof CLOTHES_CATEGORIES)[number])
+}
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -42,6 +47,7 @@ export default function EditClotheScreen() {
     defaultValues: {
       name: '',
       imageUrl: '',
+      category: 'T-shirt',
       color: '',
       description: '',
       isPublic: true,
@@ -66,6 +72,7 @@ export default function EditClotheScreen() {
         reset({
           name: clothe.name,
           imageUrl: clothe.imageUrl,
+          category: isClothesCategory(clothe.category) ? clothe.category : 'T-shirt',
           color: clothe.color ?? '',
           description: clothe.description ?? '',
           isPublic: clothe.isPublic,
@@ -114,6 +121,7 @@ export default function EditClotheScreen() {
         name: data.name,
         imageUrl: data.imageUrl,
         imageBase64,
+        category: data.category,
         color: data.color?.trim() ? data.color : null,
         description: data.description?.trim() ? data.description : null,
         isPublic: data.isPublic,
@@ -184,7 +192,9 @@ export default function EditClotheScreen() {
         )}
       />
       {errors.imageUrl ? <Text style={styles.errorText}>{errors.imageUrl.message}</Text> : null}
-      {imageUri ? <Image source={{ uri: imageUri }} style={styles.previewImage} /> : null}
+      {imageUri ? (
+        <Image source={{ uri: imageUri }} style={styles.previewImage} resizeMethod="resize" />
+      ) : null}
 
       <Text style={styles.label}>Couleur (optionnel)</Text>
       <Controller
@@ -201,6 +211,31 @@ export default function EditClotheScreen() {
         )}
       />
       {errors.color ? <Text style={styles.errorText}>{errors.color.message}</Text> : null}
+
+      <Text style={styles.label}>Categorie</Text>
+      <Controller
+        control={control}
+        name="category"
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.categoryWrap}>
+            {CLOTHES_CATEGORIES.map((category) => {
+              const selected = value === category
+              return (
+                <Pressable
+                  key={category}
+                  onPress={() => onChange(category)}
+                  style={[styles.categoryChip, selected ? styles.categoryChipActive : undefined]}
+                >
+                  <Text style={[styles.categoryChipText, selected ? styles.categoryChipTextActive : undefined]}>
+                    {category}
+                  </Text>
+                </Pressable>
+              )
+            })}
+          </View>
+        )}
+      />
+      {errors.category ? <Text style={styles.errorText}>{errors.category.message}</Text> : null}
 
       <Text style={styles.label}>Description (optionnel)</Text>
       <Controller
@@ -309,6 +344,32 @@ const styles = StyleSheet.create({
   multiline: {
     minHeight: 90,
     textAlignVertical: 'top',
+  },
+  categoryWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 14,
+  },
+  categoryChip: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#FFFFFF',
+  },
+  categoryChipActive: {
+    borderColor: '#0F766E',
+    backgroundColor: '#F0FDFA',
+  },
+  categoryChipText: {
+    color: '#374151',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  categoryChipTextActive: {
+    color: '#115E59',
   },
   switchRow: {
     marginTop: 2,

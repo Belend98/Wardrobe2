@@ -1,4 +1,6 @@
 import type { ClothesModel } from '@/shared/model/clothesModel'
+import ClotheEngagementBar from '@/src/features/clothes/component/ClotheEngagementBar'
+import type { ClotheCommentModel } from '@/src/features/clothes/clothesService'
 import React from 'react'
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
@@ -6,10 +8,41 @@ type ClotheCardProps = {
   item: ClothesModel
   onDelete?: (id: string) => void
   onEdit?: (id: string) => void
+  onToggleLike?: (id: string, shouldLike: boolean) => void
+  onToggleFavorite?: (id: string, shouldFavorite: boolean) => void
+  isLikedByMe?: boolean
+  isFavoriteByMe?: boolean
+  likesCount?: number
+  isLikeLoading?: boolean
+  isFavoriteLoading?: boolean
+  commentsCount?: number
+  comments?: ClotheCommentModel[]
+  isCommentLoading?: boolean
+  currentUserId?: string | null
+  userNamesByUserId?: Record<string, string>
+  onAddComment?: (id: string, content: string) => void
   isDeleting?: boolean
 }
 
-export default function ClotheCard({ item, onDelete, onEdit, isDeleting = false }: ClotheCardProps) {
+export default function ClotheCard({
+  item,
+  onDelete,
+  onEdit,
+  onToggleLike,
+  onToggleFavorite,
+  isLikedByMe = false,
+  isFavoriteByMe = false,
+  likesCount = 0,
+  isLikeLoading = false,
+  isFavoriteLoading = false,
+  commentsCount = 0,
+  comments = [],
+  isCommentLoading = false,
+  currentUserId = null,
+  userNamesByUserId = {},
+  onAddComment,
+  isDeleting = false,
+}: ClotheCardProps) {
   const [imageError, setImageError] = React.useState(false)
 
   return (
@@ -43,7 +76,24 @@ export default function ClotheCard({ item, onDelete, onEdit, isDeleting = false 
           </View>
         </View>
         {item.color ? <Text style={styles.cardMeta}>Couleur: {item.color}</Text> : null}
+        {item.category ? <Text style={styles.cardMeta}>Categorie: {item.category}</Text> : null}
         <Text style={styles.cardMeta}>{item.isPublic ? 'Public' : 'Prive'}</Text>
+        <ClotheEngagementBar
+          clotheId={item.id}
+          likesCount={likesCount}
+          isLikedByMe={isLikedByMe}
+          isFavoriteByMe={isFavoriteByMe}
+          isLikeLoading={isLikeLoading}
+          isFavoriteLoading={isFavoriteLoading}
+          commentsCount={commentsCount}
+          comments={comments}
+          isCommentLoading={isCommentLoading}
+          currentUserId={currentUserId}
+          userNamesByUserId={userNamesByUserId}
+          onToggleLike={onToggleLike}
+          onToggleFavorite={onToggleFavorite}
+          onAddComment={onAddComment}
+        />
       </View>
     </View>
   )
@@ -51,15 +101,21 @@ export default function ClotheCard({ item, onDelete, onEdit, isDeleting = false 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    flex: 1,
+    backgroundColor: '#FFFEFC',
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E7E5E4',
     overflow: 'hidden',
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
   image: {
     width: '100%',
-    height: 180,
+    aspectRatio: 1,
     backgroundColor: '#E5E7EB',
   },
   imageFallback: {
@@ -71,8 +127,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   cardContent: {
-    padding: 12,
-    gap: 4,
+    padding: 10,
+    gap: 5,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -86,14 +142,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1F2937',
     flex: 1,
   },
   cardMeta: {
-    color: '#6B7280',
-    fontSize: 13,
+    color: '#78716C',
+    fontSize: 11,
+    fontWeight: '600',
   },
   deleteButton: {
     borderWidth: 1,
