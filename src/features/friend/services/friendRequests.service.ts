@@ -9,6 +9,19 @@ export async function sendFriendRequest(receiverId: string) {
     throw new Error("Tu ne peux pas t'ajouter toi-meme.")
   }
 
+  const { data: existingFriendship, error: existingFriendshipError } = await supabase
+    .from('friendships')
+    .select('user_id, friend_id')
+    .or(
+      `and(user_id.eq.${senderId},friend_id.eq.${receiverId}),and(user_id.eq.${receiverId},friend_id.eq.${senderId})`,
+    )
+    .limit(1)
+
+  if (existingFriendshipError) throw existingFriendshipError
+  if (existingFriendship && existingFriendship.length > 0) {
+    throw new Error('Vous etes deja amis.')
+  }
+
   const { data: existingPending, error: existingPendingError } = await supabase
     .from('friend_requests')
     .select('id')

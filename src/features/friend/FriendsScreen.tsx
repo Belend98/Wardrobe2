@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import {
   getMyFriends,
   getReceivedFriendRequests,
@@ -29,6 +29,7 @@ export default function FriendsScreen() {
   const [isLoadingFriends, setIsLoadingFriends] = useState(true)
   const [friends, setFriends] = useState<FriendItem[]>([])
   const [removingFriendId, setRemovingFriendId] = useState<string | null>(null)
+  const [isRefreshingScreen, setIsRefreshingScreen] = useState(false)
 
   const loadReceivedRequests = useCallback(async () => {
     try {
@@ -61,6 +62,16 @@ export default function FriendsScreen() {
   useEffect(() => {
     void loadMyFriends()
   }, [loadMyFriends])
+
+  const handleRefreshScreen = useCallback(async () => {
+    setIsRefreshingScreen(true)
+    setErrorText(null)
+    try {
+      await Promise.all([loadReceivedRequests(), loadMyFriends()])
+    } finally {
+      setIsRefreshingScreen(false)
+    }
+  }, [loadMyFriends, loadReceivedRequests])
 
   const handleSearch = async () => {
     setErrorText(null)
@@ -136,7 +147,13 @@ export default function FriendsScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshingScreen} onRefresh={handleRefreshScreen} />
+      }
+    >
       <Text style={styles.title}>Amis</Text>
       <Text style={styles.subtitle}>Recherche un utilisateur par son nom.</Text>
 

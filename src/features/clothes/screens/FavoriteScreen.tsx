@@ -4,7 +4,10 @@ import ClotheCard from '@/src/features/clothes/component/ClotheCard'
 import { CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
 import { getMyFavoriteClothes } from '@/src/features/clothes/clothesService'
 import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
-import { useFocusEffect } from '@react-navigation/native'
+import {
+  hydrateFavoriteClothesCache,
+  persistFavoriteClothesCache,
+} from '@/src/features/clothes/services/clothesLists.cache'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
@@ -20,6 +23,7 @@ export default function FavoriteScreen() {
     try {
       const data = await getMyFavoriteClothes()
       setClothes(data)
+      await persistFavoriteClothesCache(data)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Impossible de charger les favoris.'
       Alert.alert('Erreur', message)
@@ -27,15 +31,19 @@ export default function FavoriteScreen() {
   }, [])
 
   useEffect(() => {
-    void loadFavorites()
-  }, [loadFavorites])
+    let active = true
+    ;(async () => {
+      const hydrated = await hydrateFavoriteClothesCache()
+      if (active && hydrated && hydrated.length > 0) {
+        setClothes(hydrated)
+      }
+      await loadFavorites()
+    })()
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadFavorites()
-      return undefined
-    }, [loadFavorites]),
-  )
+    return () => {
+      active = false
+    }
+  }, [loadFavorites])
 
   const handleRefresh = async () => {
     setIsRefreshing(true)

@@ -1,7 +1,6 @@
 import { CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
 import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
 import { useMyClothes } from '@/src/features/clothes/hooks/useMyClothes'
-import { useFocusEffect } from '@react-navigation/native'
 import { router } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
@@ -9,7 +8,7 @@ import { Alert } from 'react-native'
 export function usePersonalClothesScreen() {
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
 
-  const { clothes, isLoading, isRefreshing, deletingId, loadClothes, refreshClothes, deleteClothes, setIsLoading } =
+  const { clothes, isLoading, isRefreshing, deletingId, initializeClothes, refreshClothes, deleteClothes } =
     useMyClothes()
 
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
@@ -17,29 +16,8 @@ export function usePersonalClothesScreen() {
   })
 
   useEffect(() => {
-    let mounted = true
-
-    async function init() {
-      try {
-        await loadClothes()
-      } finally {
-        if (mounted) setIsLoading(false)
-      }
-    }
-
-    init()
-
-    return () => {
-      mounted = false
-    }
-  }, [loadClothes, setIsLoading])
-
-  useFocusEffect(
-    useCallback(() => {
-      void refreshClothes()
-      return undefined
-    }, [refreshClothes]),
-  )
+    void initializeClothes()
+  }, [initializeClothes])
 
   const handleRefresh = useCallback(async () => {
     await refreshClothes()
@@ -65,10 +43,6 @@ export function usePersonalClothesScreen() {
     )
   }, [clothes, categoryFilter])
 
-  const handleBack = useCallback(() => {
-    router.back()
-  }, [])
-
   const handleEdit = useCallback((id: string) => {
     router.push({ pathname: '/clothes/[id]/edit', params: { id } })
   }, [])
@@ -82,7 +56,6 @@ export function usePersonalClothesScreen() {
     setCategoryFilter,
     handleRefresh,
     confirmDelete,
-    handleBack,
     handleEdit,
     getCardEngagementProps,
   }

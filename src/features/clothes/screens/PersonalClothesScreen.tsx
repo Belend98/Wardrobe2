@@ -1,7 +1,7 @@
 import ClothesFilter from '@/shared/components/ClothesFilter'
 import ClothesGrid from '@/src/features/clothes/component/ClothesGrid'
 import { usePersonalClothesScreen } from '@/src/features/clothes/hooks/usePersonalClothesScreen'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import {StyleSheet, Text, View } from 'react-native'
 
 export default function PersonalClothesScreen() {
   const {
@@ -13,7 +13,6 @@ export default function PersonalClothesScreen() {
     setCategoryFilter,
     handleRefresh,
     confirmDelete,
-    handleBack,
     handleEdit,
     getCardEngagementProps,
   } = usePersonalClothesScreen()
@@ -22,14 +21,10 @@ export default function PersonalClothesScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={styles.title}>Mes vetements</Text>
+          <Text style={styles.title}>Mon dressing</Text>
           <View style={styles.headerActions}>
-            <Pressable style={styles.backButton} onPress={handleBack}>
-              <Text style={styles.backButtonText}>Retour</Text>
-            </Pressable>
           </View>
         </View>
-        <Text style={styles.subtitle}>Affichage personnel de tes vetements.</Text>
         <ClothesFilter categoryFilter={categoryFilter} onSelectCategory={setCategoryFilter} />
       </View>
 

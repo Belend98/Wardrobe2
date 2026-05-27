@@ -4,7 +4,10 @@ import ClotheCard from '@/src/features/clothes/component/ClotheCard'
 import { CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
 import { getMyAndFriendsClothes } from '@/src/features/clothes/clothesService'
 import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
-import { useFocusEffect } from '@react-navigation/native'
+import {
+  hydrateDiscoverClothesCache,
+  persistDiscoverClothesCache,
+} from '@/src/features/clothes/services/clothesLists.cache'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
@@ -20,6 +23,7 @@ export default function DiscoverScreen() {
     try {
       const data = await getMyAndFriendsClothes()
       setClothes(data)
+      await persistDiscoverClothesCache(data)
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Impossible de charger les vetements.'
@@ -28,15 +32,19 @@ export default function DiscoverScreen() {
   }, [])
 
   useEffect(() => {
-    void loadClothes()
-  }, [loadClothes])
+    let active = true
+    ;(async () => {
+      const hydrated = await hydrateDiscoverClothesCache()
+      if (active && hydrated && hydrated.length > 0) {
+        setClothes(hydrated)
+      }
+      await loadClothes()
+    })()
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadClothes()
-      return undefined
-    }, [loadClothes]),
-  )
+    return () => {
+      active = false
+    }
+  }, [loadClothes])
 
   const handleRefresh = async () => {
     setIsRefreshing(true)
