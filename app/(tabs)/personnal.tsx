@@ -165,33 +165,35 @@ export default function PersonnalScreen() {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Mes vetements</Text>
           </View>
-          <Pressable
-            onPress={handleRefresh}
-            disabled={isRefreshing || isLoading}
-            style={[styles.refreshButton, isRefreshing ? styles.buttonDisabled : undefined]}
-          >
-            <Text style={styles.refreshButtonText}>
-              {isRefreshing ? 'Rafraichissement...' : 'Rafraichir'}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={handleSignOut}
-            disabled={isSigningOut}
-            style={[styles.button, isSigningOut ? styles.buttonDisabled : undefined]}
-          >
-            <Text style={styles.buttonText}>
-              {isSigningOut ? 'Deconnexion...' : 'Se deconnecter'}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={handleDeleteAccount}
-            disabled={isDeletingAccount}
-            style={[styles.deleteAccountButton, isDeletingAccount ? styles.buttonDisabled : undefined]}
-          >
-            <Text style={styles.deleteAccountButtonText}>
-              {isDeletingAccount ? 'Suppression...' : 'Supprimer compte'}
-            </Text>
-          </Pressable>
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={handleRefresh}
+              disabled={isRefreshing || isLoading}
+              style={[styles.refreshButton, isRefreshing ? styles.buttonDisabled : undefined]}
+            >
+              <Text style={styles.refreshButtonText}>
+                {isRefreshing ? 'Rafraichissement...' : 'Rafraichir'}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={handleSignOut}
+              disabled={isSigningOut}
+              style={[styles.button, isSigningOut ? styles.buttonDisabled : undefined]}
+            >
+              <Text style={styles.buttonText}>
+                {isSigningOut ? 'Deconnexion...' : 'Se deconnecter'}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={handleDeleteAccount}
+              disabled={isDeletingAccount}
+              style={[styles.deleteAccountButton, isDeletingAccount ? styles.buttonDisabled : undefined]}
+            >
+              <Text style={styles.deleteAccountButtonText}>
+                {isDeletingAccount ? 'Suppression...' : 'Supprimer compte'}
+              </Text>
+            </Pressable>
+          </View>
         </View>
         <Text style={styles.subtitle}>Tous tes vetements publies.</Text>
         <View style={styles.filterWrap}>
@@ -271,11 +273,21 @@ const styles = StyleSheet.create({
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    rowGap: 8,
     marginBottom: 8,
   },
   titleContainer: {
     flex: 1,
+    minWidth: 200,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   title: {
     fontSize: 28,
@@ -400,7 +412,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D1D5DB',
     paddingHorizontal: 12,
-    marginRight: 8,
   },
   refreshButtonText: {
     color: '#111827',
