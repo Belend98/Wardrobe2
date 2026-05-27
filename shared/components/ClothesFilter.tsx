@@ -1,5 +1,4 @@
 import { CLOTHES_CATEGORIES, CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
-import React from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 type ClothesFilterProps = {

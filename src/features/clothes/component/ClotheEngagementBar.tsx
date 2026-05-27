@@ -1,6 +1,6 @@
-import React from 'react'
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import type { ClotheCommentModel } from '@/src/features/clothes/clothesService'
+import { useState } from 'react'
+import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 
 type ClotheEngagementBarProps = {
   clotheId: string
@@ -35,8 +35,8 @@ export default function ClotheEngagementBar({
   onToggleFavorite,
   onAddComment,
 }: ClotheEngagementBarProps) {
-  const [draftComment, setDraftComment] = React.useState('')
-  const [isCommentsModalOpen, setIsCommentsModalOpen] = React.useState(false)
+  const [draftComment, setDraftComment] = useState('')
+  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false)
   const previewComments = comments.slice(0, 3)
 
   const handleSendComment = () => {

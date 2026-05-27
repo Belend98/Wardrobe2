@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
-import React from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { signIn } from './authService'
 import { signSchema, type SignInput } from './authSchema'
+import { signIn } from './authService'
 
 const SignInScreen = () => {
   const {
@@ -15,7 +15,7 @@ const SignInScreen = () => {
     resolver: zodResolver(signSchema),
     defaultValues: { email: '', password: '' },
   })
-  const [errorText, setErrorText] = React.useState<string | null>(null)
+  const [errorText, setErrorText] = useState<string | null>(null)
 
   const onSubmit = async (data: SignInput) => {
     setErrorText(null)

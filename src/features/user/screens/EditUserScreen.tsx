@@ -1,6 +1,6 @@
 import { Controller } from 'react-hook-form'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { useEditUserProfile } from './hooks/useEditProfil'
+import { useEditUserProfile } from '../hooks/useEditProfil'
 
 export default function EditUserScreen() {
   const {

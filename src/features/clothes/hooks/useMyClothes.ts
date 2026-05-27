@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
 import { deleteMyClothe, getMyClothes } from '../../clothes/clothesService'
 
-export function usePersonalClothes() {
+export function useMyClothes() {
   const [clothes, setClothes] = useState<ClothesModel[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)

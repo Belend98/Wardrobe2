@@ -1,14 +1,13 @@
-import React from 'react'
 import { Controller } from 'react-hook-form'
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    View,
 } from 'react-native'
 import { CLOTHES_CATEGORIES } from '../clothesCategories'
 import { useCreateClotheForm } from '../hooks/useCreateClothesForm'

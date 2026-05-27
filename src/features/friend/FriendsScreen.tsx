@@ -1,15 +1,15 @@
-import React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import { searchUserByUsername, type SearchedUser } from './searchService'
 import {
-  getReceivedFriendRequests,
   getMyFriends,
+  getReceivedFriendRequests,
   removeFriend,
   respondToFriendRequest,
   sendFriendRequest,
   type FriendItem,
   type ReceivedFriendRequest,
 } from './friendrequestService'
+import { searchUserByUsername, type SearchedUser } from './searchService'
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message
@@ -17,20 +17,20 @@ function getErrorMessage(error: unknown) {
 }
 
 export default function FriendsScreen() {
-  const [query, setQuery] = React.useState('')
-  const [isSearching, setIsSearching] = React.useState(false)
-  const [result, setResult] = React.useState<SearchedUser | null>(null)
-  const [searchDone, setSearchDone] = React.useState(false)
-  const [errorText, setErrorText] = React.useState<string | null>(null)
-  const [isSendingRequest, setIsSendingRequest] = React.useState(false)
-  const [isLoadingRequests, setIsLoadingRequests] = React.useState(true)
-  const [receivedRequests, setReceivedRequests] = React.useState<ReceivedFriendRequest[]>([])
-  const [pendingActionId, setPendingActionId] = React.useState<string | null>(null)
-  const [isLoadingFriends, setIsLoadingFriends] = React.useState(true)
-  const [friends, setFriends] = React.useState<FriendItem[]>([])
-  const [removingFriendId, setRemovingFriendId] = React.useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [result, setResult] = useState<SearchedUser | null>(null)
+  const [searchDone, setSearchDone] = useState(false)
+  const [errorText, setErrorText] = useState<string | null>(null)
+  const [isSendingRequest, setIsSendingRequest] = useState(false)
+  const [isLoadingRequests, setIsLoadingRequests] = useState(true)
+  const [receivedRequests, setReceivedRequests] = useState<ReceivedFriendRequest[]>([])
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null)
+  const [isLoadingFriends, setIsLoadingFriends] = useState(true)
+  const [friends, setFriends] = useState<FriendItem[]>([])
+  const [removingFriendId, setRemovingFriendId] = useState<string | null>(null)
 
-  const loadReceivedRequests = React.useCallback(async () => {
+  const loadReceivedRequests = useCallback(async () => {
     try {
       setIsLoadingRequests(true)
       const data = await getReceivedFriendRequests()
@@ -42,11 +42,11 @@ export default function FriendsScreen() {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     void loadReceivedRequests()
   }, [loadReceivedRequests])
 
-  const loadMyFriends = React.useCallback(async () => {
+  const loadMyFriends = useCallback(async () => {
     try {
       setIsLoadingFriends(true)
       const data = await getMyFriends()
@@ -58,7 +58,7 @@ export default function FriendsScreen() {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     void loadMyFriends()
   }, [loadMyFriends])
 

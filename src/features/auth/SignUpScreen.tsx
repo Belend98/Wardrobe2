@@ -9,7 +9,7 @@ import { signSchema, type SignInput } from './authSchema'
 const SignUpScreen = () => {
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignInput>({
     resolver: zodResolver(signSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', confirmPassword: '' },
   })
   const [errorText, setErrorText] = useState<string | null>(null)
 
@@ -75,6 +75,25 @@ const SignUpScreen = () => {
         )}
       />
       {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+
+      <Text style={styles.label}>Confirmer le mot de passe</Text>
+      <Controller
+        control={control}
+        name="confirmPassword"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="Retape ton mot de passe"
+            style={styles.input}
+          />
+        )}
+      />
+      {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>}
 
       {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
 

@@ -1,6 +1,5 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native'
 import { createUserSchema, type CreateUserInput } from './userSchema'

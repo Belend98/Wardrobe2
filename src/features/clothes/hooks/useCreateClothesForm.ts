@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import {useState, useEffect, useCallback} from 'react'
+import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
 import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'

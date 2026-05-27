@@ -1,10 +1,10 @@
 import type { ClothesModel } from '@/shared/model/clothesModel'
 import ClotheCard from '@/src/features/clothes/component/ClotheCard'
-import React from 'react'
+import type { ComponentProps } from 'react'
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 type ClotheCardEngagementProps = Pick<
-  React.ComponentProps<typeof ClotheCard>,
+  ComponentProps<typeof ClotheCard>,
   | 'likesCount'
   | 'isLikedByMe'
   | 'isLikeLoading'

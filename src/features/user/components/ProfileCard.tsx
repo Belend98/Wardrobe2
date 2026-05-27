@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import React from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 type ProfileData = {

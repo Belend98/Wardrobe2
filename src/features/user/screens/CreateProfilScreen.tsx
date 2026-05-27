@@ -1,11 +1,11 @@
 import { supabase } from '@/src/utils/supabase'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
-import React from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { createUserSchema, type CreateUserInput } from './userForm/userSchema'
-import { createProfile } from './userService'
+import { createUserSchema, type CreateUserInput } from '../userForm/userSchema'
+import { createProfile } from '../userService'
 
 type SupabaseLikeError = {
   code?: string
@@ -46,7 +46,7 @@ const ProfileSetupScreen = () => {
     },
   })
 
-  const [errorText, setErrorText] = React.useState<string | null>(null)
+  const [errorText, setErrorText] = useState<string | null>(null)
 
   const handleSignOut = async () => {
     try {

@@ -1,7 +1,7 @@
 import type { ClothesModel } from '@/shared/model/clothesModel'
-import ClotheEngagementBar from '@/src/features/clothes/component/ClotheEngagementBar'
 import type { ClotheCommentModel } from '@/src/features/clothes/clothesService'
-import React from 'react'
+import ClotheEngagementBar from '@/src/features/clothes/component/ClotheEngagementBar'
+import { useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
 type ClotheCardProps = {
@@ -43,7 +43,7 @@ export default function ClotheCard({
   onAddComment,
   isDeleting = false,
 }: ClotheCardProps) {
-  const [imageError, setImageError] = React.useState(false)
+  const [imageError, setImageError] = useState(false)
 
   return (
     <View style={styles.card}>
