@@ -3,12 +3,14 @@ import { useCallback, useState, type Dispatch, type SetStateAction } from 'react
 
 type UseClotheFavoritesOptions = {
   onError?: (message: string) => void
+  currentUserId: string | null
   favoriteClotheIds: Set<string>
   setFavoriteClotheIds: Dispatch<SetStateAction<Set<string>>>
 }
 
 export function useClotheFavorites({
   onError,
+  currentUserId,
   favoriteClotheIds,
   setFavoriteClotheIds,
 }: UseClotheFavoritesOptions) {
@@ -27,8 +29,8 @@ export function useClotheFavorites({
       })
 
       try {
-        if (shouldFavorite) await addFavoriteClothe(id)
-        else await removeFavoriteClothe(id)
+        if (shouldFavorite) await addFavoriteClothe(id, currentUserId ?? undefined)
+        else await removeFavoriteClothe(id, currentUserId ?? undefined)
       } catch (error) {
         setFavoriteClotheIds((prev) => {
           const next = new Set(prev)
@@ -42,7 +44,7 @@ export function useClotheFavorites({
         setFavoriteLoadingByClotheId((prev) => ({ ...prev, [id]: false }))
       }
     },
-    [favoriteLoadingByClotheId, onError, setFavoriteClotheIds],
+    [currentUserId, favoriteLoadingByClotheId, onError, setFavoriteClotheIds],
   )
 
   return { favoriteClotheIds, favoriteLoadingByClotheId, toggleFavorite }

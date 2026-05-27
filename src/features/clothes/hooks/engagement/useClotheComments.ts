@@ -3,12 +3,14 @@ import { useCallback, useState, type Dispatch, type SetStateAction } from 'react
 
 type UseClotheCommentsOptions = {
   onError?: (message: string) => void
+  currentUserId: string | null
   commentsByClotheId: Record<string, ClotheCommentModel[]>
   setCommentsByClotheId: Dispatch<SetStateAction<Record<string, ClotheCommentModel[]>>>
 }
 
 export function useClotheComments({
   onError,
+  currentUserId,
   commentsByClotheId,
   setCommentsByClotheId,
 }: UseClotheCommentsOptions) {
@@ -25,7 +27,7 @@ export function useClotheComments({
 
       setCommentLoadingByClotheId((prev) => ({ ...prev, [id]: true }))
       try {
-        const inserted = await addCommentToClothe(id, trimmed)
+        const inserted = await addCommentToClothe(id, trimmed, currentUserId ?? undefined)
         setCommentsByClotheId((prev) => ({
           ...prev,
           [id]: [inserted, ...(prev[id] ?? [])],
@@ -37,7 +39,7 @@ export function useClotheComments({
         setCommentLoadingByClotheId((prev) => ({ ...prev, [id]: false }))
       }
     },
-    [commentLoadingByClotheId, onError, setCommentsByClotheId],
+    [commentLoadingByClotheId, currentUserId, onError, setCommentsByClotheId],
   )
 
   return { commentsByClotheId, commentLoadingByClotheId, addComment }

@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 export default function PersonalClothesScreen() {
   const {
-    gridColumns,
     clothes,
     isLoading,
     isRefreshing,
@@ -25,15 +24,6 @@ export default function PersonalClothesScreen() {
         <View style={styles.headerTop}>
           <Text style={styles.title}>Mes vetements</Text>
           <View style={styles.headerActions}>
-            <Pressable
-              onPress={handleRefresh}
-              disabled={isRefreshing || isLoading}
-              style={[styles.refreshButton, isRefreshing ? styles.buttonDisabled : undefined]}
-            >
-              <Text style={styles.refreshButtonText}>
-                {isRefreshing ? 'Rafraichissement...' : 'Rafraichir'}
-              </Text>
-            </Pressable>
             <Pressable style={styles.backButton} onPress={handleBack}>
               <Text style={styles.backButtonText}>Retour</Text>
             </Pressable>
@@ -46,7 +36,6 @@ export default function PersonalClothesScreen() {
       <ClothesGrid
         isLoading={isLoading}
         isRefreshing={isRefreshing}
-        gridColumns={gridColumns}
         clothes={clothes}
         deletingId={deletingId}
         onRefresh={handleRefresh}
@@ -88,24 +77,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 16,
     color: '#6B7280',
-  },
-  refreshButton: {
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    paddingHorizontal: 10,
-  },
-  refreshButtonText: {
-    color: '#111827',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
   },
   backButton: {
     borderWidth: 1,

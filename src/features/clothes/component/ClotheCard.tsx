@@ -75,9 +75,21 @@ export default function ClotheCard({
             ) : null}
           </View>
         </View>
-        {item.color ? <Text style={styles.cardMeta}>Couleur: {item.color}</Text> : null}
-        {item.category ? <Text style={styles.cardMeta}>Categorie: {item.category}</Text> : null}
-        <Text style={styles.cardMeta}>{item.isPublic ? 'Public' : 'Prive'}</Text>
+        <View style={styles.metaRow}>
+          {item.color ? (
+            <View style={styles.metaBadge}>
+              <Text style={styles.cardMeta}>Couleur: {item.color}</Text>
+            </View>
+          ) : null}
+          {item.category ? (
+            <View style={styles.metaBadge}>
+              <Text style={styles.cardMeta}>Categorie: {item.category}</Text>
+            </View>
+          ) : null}
+          <View style={styles.metaBadge}>
+            <Text style={styles.cardMeta}>{item.isPublic ? 'Public' : 'Prive'}</Text>
+          </View>
+        </View>
         <ClotheEngagementBar
           clotheId={item.id}
           likesCount={likesCount}
@@ -102,21 +114,21 @@ export default function ClotheCard({
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    backgroundColor: '#FFFEFC',
-    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E7E5E4',
+    borderColor: '#E5E7EB',
     overflow: 'hidden',
-    shadowColor: '#0F172A',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    shadowColor: '#111827',
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 5,
   },
   image: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#F3F4F6',
   },
   imageFallback: {
     alignItems: 'center',
@@ -127,8 +139,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   cardContent: {
-    padding: 10,
-    gap: 5,
+    padding: 12,
+    gap: 8,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -142,14 +154,27 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cardTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
-    color: '#1F2937',
+    color: '#111827',
     flex: 1,
   },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  metaBadge: {
+    borderRadius: 999,
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
   cardMeta: {
-    color: '#78716C',
-    fontSize: 11,
+    color: '#4B5563',
+    fontSize: 10,
     fontWeight: '600',
   },
   deleteButton: {

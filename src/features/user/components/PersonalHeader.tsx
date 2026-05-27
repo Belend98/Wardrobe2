@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { router } from 'expo-router'
 import ProfileCard from './ProfileCard'
 
 type ProfileData = {
@@ -9,24 +10,16 @@ type ProfileData = {
 }
 
 type PersonalHeaderProps = {
-  isRefreshing: boolean
   isLoading: boolean
   isSigningOut: boolean
-  isDeletingAccount: boolean
-  onRefresh: () => void
   onSignOut: () => void
-  onDeleteAccount: () => void
   profile: ProfileData | null
 }
 
 export default function PersonalHeader({
-  isRefreshing,
   isLoading,
   isSigningOut,
-  isDeletingAccount,
-  onRefresh,
   onSignOut,
-  onDeleteAccount,
   profile,
 }: PersonalHeaderProps) {
   return (
@@ -35,36 +28,24 @@ export default function PersonalHeader({
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Mon profil</Text>
         </View>
-        <View style={styles.headerActions}>
-          <Pressable
-            onPress={onRefresh}
-            disabled={isRefreshing || isLoading}
-            style={[styles.refreshButton, isRefreshing ? styles.buttonDisabled : undefined]}
-          >
-            <Text style={styles.refreshButtonText}>
-              {isRefreshing ? 'Rafraichissement...' : 'Rafraichir'}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={onSignOut}
-            disabled={isSigningOut}
-            style={[styles.button, isSigningOut ? styles.buttonDisabled : undefined]}
-          >
-            <Text style={styles.buttonText}>{isSigningOut ? 'Deconnexion...' : 'Se deconnecter'}</Text>
-          </Pressable>
-          <Pressable
-            onPress={onDeleteAccount}
-            disabled={isDeletingAccount}
-            style={[styles.deleteAccountButton, isDeletingAccount ? styles.buttonDisabled : undefined]}
-          >
-            <Text style={styles.deleteAccountButtonText}>
-              {isDeletingAccount ? 'Suppression...' : 'Supprimer compte'}
-            </Text>
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={onSignOut}
+          disabled={isSigningOut || isLoading}
+          style={[styles.button, isSigningOut ? styles.buttonDisabled : undefined]}
+        >
+          <Text style={styles.buttonText}>{isSigningOut ? 'Deconnexion...' : 'Se deconnecter'}</Text>
+        </Pressable>
       </View>
       <Text style={styles.subtitle}>Consulte et gere tes informations personnelles.</Text>
       <ProfileCard profile={profile} />
+      <View style={styles.quickActions}>
+        <Pressable style={styles.friendsButton} onPress={() => router.push('/friends')}>
+          <Text style={styles.friendsButtonText}>Amis</Text>
+        </Pressable>
+        <Pressable style={styles.clothesButton} onPress={() => router.push('/user/clothes')}>
+          <Text style={styles.clothesButtonText}>Vetements</Text>
+        </Pressable>
+      </View>
     </View>
   )
 }
@@ -87,13 +68,6 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 200,
   },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -104,6 +78,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
+  quickActions: {
+    marginTop: 10,
+    flexDirection: 'row',
+    gap: 8,
+  },
   button: {
     height: 36,
     borderRadius: 8,
@@ -112,20 +91,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#111827',
     paddingHorizontal: 12,
   },
-  refreshButton: {
-    height: 36,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    paddingHorizontal: 12,
-  },
-  refreshButtonText: {
-    color: '#111827',
-    fontWeight: '700',
-  },
   buttonDisabled: {
     opacity: 0.6,
   },
@@ -133,16 +98,30 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
   },
-  deleteAccountButton: {
-    height: 36,
+  friendsButton: {
+    borderWidth: 1,
+    borderColor: '#86EFAC',
+    backgroundColor: '#F0FDF4',
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#B91C1C',
+    paddingVertical: 8,
     paddingHorizontal: 12,
   },
-  deleteAccountButtonText: {
-    color: '#FFFFFF',
+  friendsButtonText: {
+    color: '#166534',
     fontWeight: '700',
+    fontSize: 12,
+  },
+  clothesButton: {
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    backgroundColor: '#FFFBEB',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  clothesButtonText: {
+    color: '#92400E',
+    fontWeight: '700',
+    fontSize: 12,
   },
 })

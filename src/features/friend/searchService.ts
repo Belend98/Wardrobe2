@@ -7,7 +7,7 @@ export type SearchedUser = {
 }
 
 export async function searchUserByUsername(rawUsername: string): Promise<SearchedUser | null> {
-  const username = rawUsername.trim().toLowerCase()
+  const username = rawUsername.trim()
 
   if (!username) {
     return null
@@ -16,7 +16,7 @@ export async function searchUserByUsername(rawUsername: string): Promise<Searche
   const { data, error } = await supabase
     .from('users')
     .select('id, username, bio')
-    .eq('username', username)
+    .ilike('username', username)
     .maybeSingle()
 
   if (error) {

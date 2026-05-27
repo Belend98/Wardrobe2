@@ -72,8 +72,8 @@ export async function getEngagementSnapshotForClothes(clotheIds: string[]) {
   }
 }
 
-export async function likeClothe(clotheId: string) {
-  const userId = await getCurrentUserIdOrThrow()
+export async function likeClothe(clotheId: string, userIdParam?: string) {
+  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
   try {
     await insertLike({ clothe_id: clotheId, user_id: userId })
   } catch (error) {
@@ -82,13 +82,13 @@ export async function likeClothe(clotheId: string) {
   }
 }
 
-export async function unlikeClothe(clotheId: string) {
-  const userId = await getCurrentUserIdOrThrow()
+export async function unlikeClothe(clotheId: string, userIdParam?: string) {
+  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
   await deleteLike({ clothe_id: clotheId, user_id: userId })
 }
 
-export async function addCommentToClothe(clotheId: string, content: string) {
-  const userId = await getCurrentUserIdOrThrow()
+export async function addCommentToClothe(clotheId: string, content: string, userIdParam?: string) {
+  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
   const trimmed = content.trim()
   if (!trimmed) throw new Error('Le commentaire ne peut pas etre vide.')
 

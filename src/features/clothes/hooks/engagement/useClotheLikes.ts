@@ -3,6 +3,7 @@ import { useCallback, useState, type Dispatch, type SetStateAction } from 'react
 
 type UseClotheLikesOptions = {
   onError?: (message: string) => void
+  currentUserId: string | null
   likedClotheIds: Set<string>
   setLikedClotheIds: Dispatch<SetStateAction<Set<string>>>
   setLikesCountByClotheId: Dispatch<SetStateAction<Record<string, number>>>
@@ -10,6 +11,7 @@ type UseClotheLikesOptions = {
 
 export function useClotheLikes({
   onError,
+  currentUserId,
   likedClotheIds,
   setLikedClotheIds,
   setLikesCountByClotheId,
@@ -33,8 +35,8 @@ export function useClotheLikes({
       }))
 
       try {
-        if (shouldLike) await likeClothe(id)
-        else await unlikeClothe(id)
+        if (shouldLike) await likeClothe(id, currentUserId ?? undefined)
+        else await unlikeClothe(id, currentUserId ?? undefined)
       } catch (error) {
         setLikedClotheIds((prev) => {
           const next = new Set(prev)
@@ -52,7 +54,7 @@ export function useClotheLikes({
         setLikeLoadingByClotheId((prev) => ({ ...prev, [id]: false }))
       }
     },
-    [likeLoadingByClotheId, onError, setLikedClotheIds, setLikesCountByClotheId],
+    [currentUserId, likeLoadingByClotheId, onError, setLikedClotheIds, setLikesCountByClotheId],
   )
 
   return { likedClotheIds, likeLoadingByClotheId, toggleLike }

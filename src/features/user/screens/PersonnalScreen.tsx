@@ -1,51 +1,53 @@
 import PersonalHeader from '@/src/features/user/components/PersonalHeader'
 import { usePersonalActions } from '@/src/features/user/hooks/usePersonalActions'
 import { useUserProfile } from '@/src/features/user/hooks/useUserProfile'
-import {useState, useEffect, useCallback} from 'react'
-import { StyleSheet, View } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
+import { useCallback } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 export default function PersonnalScreen() {
   const { profile, isLoading: profileIsLoading, loadProfile, setIsLoading: setProfileIsLoading } = useUserProfile()
   const { isSigningOut, isDeletingAccount, handleSignOut, handleDeleteAccount } = usePersonalActions()
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
-  useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      try {
-        await loadProfile()
-      } finally {
-        if (mounted) setProfileIsLoading(false)
+  useFocusEffect(
+    useCallback(() => {
+      let active = true
+      ;(async () => {
+        setProfileIsLoading(true)
+        try {
+          await loadProfile()
+        } finally {
+          if (active) setProfileIsLoading(false)
+        }
+      })()
+
+      return () => {
+        active = false
       }
-    })()
-    return () => {
-      mounted = false
-    }
-  }, [loadProfile, setProfileIsLoading])
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true)
-    setProfileIsLoading(true)
-    try {
-      await loadProfile()
-    } finally {
-      setProfileIsLoading(false)
-      setIsRefreshing(false)
-    }
-  }, [loadProfile, setProfileIsLoading])
+    }, [loadProfile, setProfileIsLoading]),
+  )
 
   return (
     <View style={styles.container}>
+      <View style={styles.content}>
       <PersonalHeader
-        isRefreshing={isRefreshing}
         isLoading={profileIsLoading}
         isSigningOut={isSigningOut}
-        isDeletingAccount={isDeletingAccount}
-        onRefresh={handleRefresh}
         onSignOut={handleSignOut}
-        onDeleteAccount={handleDeleteAccount}
         profile={profile}
       />
+      </View>
+      <View style={styles.bottomBar}>
+        <Pressable
+          onPress={handleDeleteAccount}
+          disabled={isDeletingAccount}
+          style={[styles.deleteAccountButton, isDeletingAccount ? styles.buttonDisabled : undefined]}
+        >
+          <Text style={styles.deleteAccountButtonText}>
+            {isDeletingAccount ? 'Suppression...' : 'Supprimer compte'}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   )
 }
@@ -54,5 +56,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F4',
+  },
+  content: {
+    flex: 1,
+  },
+  bottomBar: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  deleteAccountButton: {
+    height: 40,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#B91C1C',
+    paddingHorizontal: 14,
+  },
+  deleteAccountButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 })

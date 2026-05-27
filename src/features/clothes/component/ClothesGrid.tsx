@@ -23,7 +23,6 @@ type ClotheCardEngagementProps = Pick<
 type ClothesGridProps = {
   isLoading: boolean
   isRefreshing: boolean
-  gridColumns: number
   clothes: ClothesModel[]
   deletingId: string | null
   onRefresh: () => void
@@ -35,7 +34,6 @@ type ClothesGridProps = {
 export default function ClothesGrid({
   isLoading,
   isRefreshing,
-  gridColumns,
   clothes,
   deletingId,
   onRefresh,
@@ -53,9 +51,7 @@ export default function ClothesGrid({
 
   return (
     <FlatList
-      key={`personnal-grid-${gridColumns}`}
       data={clothes}
-      numColumns={gridColumns}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <ClotheCard
@@ -67,7 +63,6 @@ export default function ClothesGrid({
         />
       )}
       contentContainerStyle={styles.listContent}
-      columnWrapperStyle={gridColumns > 1 ? styles.gridRow : undefined}
       refreshing={isRefreshing}
       onRefresh={onRefresh}
       ListEmptyComponent={
@@ -83,9 +78,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    gap: 12,
-  },
-  gridRow: {
     gap: 12,
   },
   centerState: {

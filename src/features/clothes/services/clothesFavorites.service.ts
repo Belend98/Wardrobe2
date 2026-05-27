@@ -23,8 +23,8 @@ export async function getMyFavoriteClothes() {
   )
 }
 
-export async function addFavoriteClothe(clotheId: string) {
-  const userId = await getCurrentUserIdOrThrow()
+export async function addFavoriteClothe(clotheId: string, userIdParam?: string) {
+  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
   try {
     await insertFavorite({ clothe_id: clotheId, user_id: userId })
   } catch (error) {
@@ -33,7 +33,7 @@ export async function addFavoriteClothe(clotheId: string) {
   }
 }
 
-export async function removeFavoriteClothe(clotheId: string) {
-  const userId = await getCurrentUserIdOrThrow()
+export async function removeFavoriteClothe(clotheId: string, userIdParam?: string) {
+  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
   await deleteFavorite({ clothe_id: clotheId, user_id: userId })
 }

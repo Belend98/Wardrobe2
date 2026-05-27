@@ -1,13 +1,12 @@
 import { CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
 import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
 import { useMyClothes } from '@/src/features/clothes/hooks/useMyClothes'
-import { useGridColumns } from '@/src/features/user/hooks/useGridColumns'
+import { useFocusEffect } from '@react-navigation/native'
 import { router } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 
 export function usePersonalClothesScreen() {
-  const gridColumns = useGridColumns()
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
 
   const { clothes, isLoading, isRefreshing, deletingId, loadClothes, refreshClothes, deleteClothes, setIsLoading } =
@@ -34,6 +33,13 @@ export function usePersonalClothesScreen() {
       mounted = false
     }
   }, [loadClothes, setIsLoading])
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshClothes()
+      return undefined
+    }, [refreshClothes]),
+  )
 
   const handleRefresh = useCallback(async () => {
     await refreshClothes()
@@ -68,7 +74,6 @@ export function usePersonalClothesScreen() {
   }, [])
 
   return {
-    gridColumns,
     clothes: filteredClothes,
     isLoading,
     isRefreshing,

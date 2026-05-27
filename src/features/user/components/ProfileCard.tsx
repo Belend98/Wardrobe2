@@ -18,12 +18,6 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
       <View style={styles.profileHeader}>
         <Text style={styles.profileTitle}>Mon profil</Text>
         <View style={styles.profileActions}>
-          <Pressable style={styles.friendsButton} onPress={() => router.push('/friends')}>
-            <Text style={styles.friendsButtonText}>Amis</Text>
-          </Pressable>
-          <Pressable style={styles.clothesButton} onPress={() => router.push('/user/clothes')}>
-            <Text style={styles.clothesButtonText}>Vetements</Text>
-          </Pressable>
           <Pressable style={styles.editProfileButton} onPress={() => router.push('/user/edit')}>
             <Text style={styles.editProfileButtonText}>Modifier</Text>
           </Pressable>
@@ -79,32 +73,6 @@ const styles = StyleSheet.create({
   },
   editProfileButtonText: {
     color: '#1D4ED8',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  friendsButton: {
-    borderWidth: 1,
-    borderColor: '#86EFAC',
-    backgroundColor: '#F0FDF4',
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-  friendsButtonText: {
-    color: '#166534',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  clothesButton: {
-    borderWidth: 1,
-    borderColor: '#FCD34D',
-    backgroundColor: '#FFFBEB',
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-  clothesButtonText: {
-    color: '#92400E',
     fontWeight: '700',
     fontSize: 12,
   },
