@@ -3,21 +3,21 @@ import ClotheCard from '@/src/features/clothes/component/ClotheCard'
 import { CLOTHES_CATEGORIES, CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
 import { getMyAndFriendsClothes } from '@/src/features/clothes/clothesService'
 import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
-import React from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import { Alert, FlatList, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
 
 export default function DiscoverScreen() {
   const { width } = useWindowDimensions()
   const gridColumns = width < 900 ? 1 : Math.max(4, Math.min(6, Math.floor((width - 40) / 170)))
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [isRefreshing, setIsRefreshing] = React.useState(false)
-  const [clothes, setClothes] = React.useState<ClothesModel[]>([])
-  const [categoryFilter, setCategoryFilter] = React.useState<string>(CLOTHES_CATEGORY_ALL)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [clothes, setClothes] = useState<ClothesModel[]>([])
+  const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
     onError: (message) => Alert.alert('Erreur', message),
   })
 
-  const loadClothes = React.useCallback(async () => {
+  const loadClothes = useCallback(async () => {
     try {
       const data = await getMyAndFriendsClothes()
       setClothes(data)
@@ -28,7 +28,7 @@ export default function DiscoverScreen() {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true
     ;(async () => {
       try {

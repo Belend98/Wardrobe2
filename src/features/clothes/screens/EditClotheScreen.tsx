@@ -1,9 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { router, useLocalSearchParams } from 'expo-router'
 import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import {
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -13,126 +10,21 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
-import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
-import { getMyClotheById, updateMyClothe } from '../clothesService'
 import { CLOTHES_CATEGORIES } from '../clothesCategories'
-
-function isClothesCategory(value: unknown): value is CreateClotheInput['category'] {
-  return typeof value === 'string' && CLOTHES_CATEGORIES.includes(value as (typeof CLOTHES_CATEGORIES)[number])
-}
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message
-  }
-  return 'Une erreur est survenue.'
-}
+import { useEditClotheForm } from '../hooks/useEditClothesForm'
 
 export default function EditClotheScreen() {
-  const { id } = useLocalSearchParams<{ id?: string }>()
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [errorText, setErrorText] = React.useState<string | null>(null)
-  const [imageBase64, setImageBase64] = React.useState<string | null>(null)
-
   const {
     control,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateClotheInput>({
-    resolver: zodResolver(createClotheSchema),
-    defaultValues: {
-      name: '',
-      imageUrl: '',
-      category: 'T-shirt',
-      color: '',
-      description: '',
-      isPublic: true,
-    },
-  })
-
-  const imageUri = watch('imageUrl')
-
-  React.useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      if (!id) {
-        setErrorText('ID du vetement manquant.')
-        setIsLoading(false)
-        return
-      }
-
-      try {
-        const clothe = await getMyClotheById(id)
-        if (!mounted) return
-
-        reset({
-          name: clothe.name,
-          imageUrl: clothe.imageUrl,
-          category: isClothesCategory(clothe.category) ? clothe.category : 'T-shirt',
-          color: clothe.color ?? '',
-          description: clothe.description ?? '',
-          isPublic: clothe.isPublic,
-        })
-      } catch (error) {
-        if (!mounted) return
-        setErrorText(getErrorMessage(error))
-      } finally {
-        if (mounted) setIsLoading(false)
-      }
-    })()
-
-    return () => {
-      mounted = false
-    }
-  }, [id, reset])
-
-  const handlePickImage = async () => {
-    try {
-      const media = await pickImageFromLibrary()
-      if (!media) return
-      setImageBase64(media.base64 ?? null)
-      setValue('imageUrl', media.uri, { shouldValidate: true, shouldDirty: true })
-    } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error))
-    }
-  }
-
-  const handleTakePhoto = async () => {
-    try {
-      const media = await takePhotoWithCamera()
-      if (!media) return
-      setImageBase64(media.base64 ?? null)
-      setValue('imageUrl', media.uri, { shouldValidate: true, shouldDirty: true })
-    } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error))
-    }
-  }
-
-  const onSubmit = async (data: CreateClotheInput) => {
-    if (!id) return
-    setErrorText(null)
-
-    try {
-      await updateMyClothe(id, {
-        name: data.name,
-        imageUrl: data.imageUrl,
-        imageBase64,
-        category: data.category,
-        color: data.color?.trim() ? data.color : null,
-        description: data.description?.trim() ? data.description : null,
-        isPublic: data.isPublic,
-      })
-
-      Alert.alert('Succes', 'Vetement modifie.')
-      router.back()
-    } catch (error) {
-      setErrorText(getErrorMessage(error))
-    }
-  }
+    formState: { errors },
+    isLoading,
+    isSubmitting,
+    errorText,
+    imageUri,
+    handlePickImage,
+    handleTakePhoto,
+    onSubmit,
+  } = useEditClotheForm()
 
   if (isLoading) {
     return (
@@ -271,7 +163,7 @@ export default function EditClotheScreen() {
       {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
 
       <Pressable
-        onPress={handleSubmit(onSubmit)}
+        onPress={onSubmit}
         style={[styles.button, isSubmitting ? styles.buttonDisabled : undefined]}
         disabled={isSubmitting}
       >

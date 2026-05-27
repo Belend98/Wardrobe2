@@ -1,0 +1,98 @@
+import type { ClothesModel } from '@/shared/model/clothesModel'
+import ClotheCard from '@/src/features/clothes/component/ClotheCard'
+import React from 'react'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
+
+type ClotheCardEngagementProps = Pick<
+  React.ComponentProps<typeof ClotheCard>,
+  | 'likesCount'
+  | 'isLikedByMe'
+  | 'isLikeLoading'
+  | 'isFavoriteByMe'
+  | 'isFavoriteLoading'
+  | 'comments'
+  | 'commentsCount'
+  | 'isCommentLoading'
+  | 'currentUserId'
+  | 'userNamesByUserId'
+  | 'onToggleLike'
+  | 'onToggleFavorite'
+  | 'onAddComment'
+>
+
+type ClothesGridProps = {
+  isLoading: boolean
+  isRefreshing: boolean
+  gridColumns: number
+  clothes: ClothesModel[]
+  deletingId: string | null
+  onRefresh: () => void
+  onDelete: (id: string) => void
+  onEdit: (id: string) => void
+  getCardEngagementProps: (id: string) => ClotheCardEngagementProps
+}
+
+export default function ClothesGrid({
+  isLoading,
+  isRefreshing,
+  gridColumns,
+  clothes,
+  deletingId,
+  onRefresh,
+  onDelete,
+  onEdit,
+  getCardEngagementProps,
+}: ClothesGridProps) {
+  if (isLoading) {
+    return (
+      <View style={styles.centerState}>
+        <Text style={styles.stateText}>Chargement...</Text>
+      </View>
+    )
+  }
+
+  return (
+    <FlatList
+      key={`personnal-grid-${gridColumns}`}
+      data={clothes}
+      numColumns={gridColumns}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <ClotheCard
+          item={item}
+          onDelete={onDelete}
+          onEdit={onEdit}
+          isDeleting={deletingId === item.id}
+          {...getCardEngagementProps(item.id)}
+        />
+      )}
+      contentContainerStyle={styles.listContent}
+      columnWrapperStyle={gridColumns > 1 ? styles.gridRow : undefined}
+      refreshing={isRefreshing}
+      onRefresh={onRefresh}
+      ListEmptyComponent={
+        <View style={styles.centerState}>
+          <Text style={styles.stateText}>Tu n&apos;as pas encore publie de vetement.</Text>
+        </View>
+      }
+    />
+  )
+}
+
+const styles = StyleSheet.create({
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 12,
+  },
+  gridRow: {
+    gap: 12,
+  },
+  centerState: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  stateText: {
+    color: '#6B7280',
+  },
+})

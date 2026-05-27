@@ -1,68 +1,16 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { router } from 'expo-router'
-import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { createUserSchema, type CreateUserInput } from './userForm/userSchema'
-import { getCurrentUserProfileOrThrow, updateCurrentUserProfile } from './userService'
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message
-  return 'Impossible de modifier le profil.'
-}
+import { Controller } from 'react-hook-form'
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { useEditUserProfile } from './hooks/useEditProfil'
 
 export default function EditUserScreen() {
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [errorText, setErrorText] = React.useState<string | null>(null)
-
   const {
     control,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateUserInput>({
-    resolver: zodResolver(createUserSchema),
-    defaultValues: {
-      username: '',
-      bio: '',
-    },
-  })
-
-  React.useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      try {
-        const profile = await getCurrentUserProfileOrThrow()
-        if (!mounted) return
-        reset({
-          username: profile.username,
-          bio: profile.bio ?? '',
-        })
-      } catch (error) {
-        if (mounted) setErrorText(getErrorMessage(error))
-      } finally {
-        if (mounted) setIsLoading(false)
-      }
-    })()
-
-    return () => {
-      mounted = false
-    }
-  }, [reset])
-
-  const onSubmit = async (data: CreateUserInput) => {
-    setErrorText(null)
-    try {
-      await updateCurrentUserProfile({
-        username: data.username,
-        bio: data.bio,
-      })
-      Alert.alert('Succes', 'Profil mis a jour.')
-      router.back()
-    } catch (error) {
-      setErrorText(getErrorMessage(error))
-    }
-  }
+    formState: { errors },
+    isLoading,
+    isSubmitting,
+    errorText,
+    submitForm,
+  } = useEditUserProfile()
 
   if (isLoading) {
     return (
@@ -75,9 +23,14 @@ export default function EditUserScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Modifier le profil</Text>
-      <Text style={styles.subtitle}>Mets a jour les attributs de ton compte.</Text>
+      <Text style={styles.subtitle}>
+        Mets à jour les attributs de ton compte.
+      </Text>
 
-      <Text style={styles.label}>Nom d&apos;utilisateur</Text>
+      <Text style={styles.label}>
+        Nom d'utilisateur
+      </Text>
+
       <Controller
         control={control}
         name="username"
@@ -92,9 +45,17 @@ export default function EditUserScreen() {
           />
         )}
       />
-      {errors.username ? <Text style={styles.errorText}>{errors.username.message}</Text> : null}
 
-      <Text style={styles.label}>Bio</Text>
+      {errors.username && (
+        <Text style={styles.errorText}>
+          {errors.username.message}
+        </Text>
+      )}
+
+      <Text style={styles.label}>
+        Bio
+      </Text>
+
       <Controller
         control={control}
         name="bio"
@@ -110,15 +71,32 @@ export default function EditUserScreen() {
           />
         )}
       />
-      {errors.bio ? <Text style={styles.errorText}>{errors.bio.message}</Text> : null}
-      {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+
+      {errors.bio && (
+        <Text style={styles.errorText}>
+          {errors.bio.message}
+        </Text>
+      )}
+
+      {errorText && (
+        <Text style={styles.errorText}>
+          {errorText}
+        </Text>
+      )}
 
       <Pressable
-        onPress={handleSubmit(onSubmit)}
-        style={[styles.button, isSubmitting ? styles.buttonDisabled : undefined]}
+        onPress={submitForm}
         disabled={isSubmitting}
+        style={[
+          styles.button,
+          isSubmitting && styles.buttonDisabled,
+        ]}
       >
-        <Text style={styles.buttonText}>{isSubmitting ? 'Enregistrement...' : 'Enregistrer'}</Text>
+        <Text style={styles.buttonText}>
+          {isSubmitting
+            ? 'Enregistrement...'
+            : 'Enregistrer'}
+        </Text>
       </Pressable>
     </View>
   )

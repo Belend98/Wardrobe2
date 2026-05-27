@@ -26,6 +26,7 @@ const SignUpScreen = () => {
         'Verifie ton email',
         'Ton compte est cree. Verifie ta boite mail pour confirmer ton adresse.',
       )
+      
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Une erreur est survenue.'
       setErrorText(message)

@@ -1,8 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import {
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -12,107 +10,19 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
-import { createMyClothe } from '../clothesService'
-import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
 import { CLOTHES_CATEGORIES } from '../clothesCategories'
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  if (typeof error === 'object' && error !== null) {
-    const maybeSupabaseError = error as {
-      message?: string
-      code?: string
-      details?: string
-      hint?: string
-    }
-
-    const parts = [
-      maybeSupabaseError.message,
-      maybeSupabaseError.code ? `code: ${maybeSupabaseError.code}` : undefined,
-      maybeSupabaseError.details,
-      maybeSupabaseError.hint,
-    ].filter(Boolean)
-
-    if (parts.length > 0) {
-      return parts.join(' | ')
-    }
-  }
-
-  return 'Une erreur est survenue.'
-}
+import { useCreateClotheForm } from '../hooks/useCreateClothesForm'
 
 const CreateClotheScreen = () => {
   const {
     control,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
+    submitForm,
+    imageUri,
+    errorText,
+    handlePickImage,
+    handleTakePhoto,
     formState: { errors, isSubmitting },
-  } = useForm<CreateClotheInput>({
-    resolver: zodResolver(createClotheSchema),
-    defaultValues: {
-      name: '',
-      imageUrl: '',
-      category: 'T-shirt',
-      color: '',
-      description: '',
-      isPublic: true,
-    },
-  })
-
-  const [errorText, setErrorText] = React.useState<string | null>(null)
-  const [imageBase64, setImageBase64] = React.useState<string | null>(null)
-  const imageUri = watch('imageUrl')
-
-  const handlePickImage = async () => {
-    try {
-      const media = await pickImageFromLibrary()
-      if (!media) return
-      setImageBase64(media.base64 ?? null)
-      setValue('imageUrl', media.uri, { shouldValidate: true, shouldDirty: true })
-    } catch (error) {
-      const message = getErrorMessage(error)
-      Alert.alert('Erreur', message)
-    }
-  }
-
-  const handleTakePhoto = async () => {
-    try {
-      const media = await takePhotoWithCamera()
-      if (!media) return
-      setImageBase64(media.base64 ?? null)
-      setValue('imageUrl', media.uri, { shouldValidate: true, shouldDirty: true })
-    } catch (error) {
-      const message = getErrorMessage(error)
-      Alert.alert('Erreur', message)
-    }
-  }
-
-  const onSubmit = async (data: CreateClotheInput) => {
-    setErrorText(null)
-    try {
-      await createMyClothe({
-        name: data.name,
-        imageUrl: data.imageUrl,
-        imageBase64,
-        category: data.category,
-        color: data.color?.trim() ? data.color : null,
-        description: data.description?.trim() ? data.description : null,
-        isPublic: data.isPublic,
-      })
-
-      Alert.alert('Succes', 'Vetement publie.')
-      reset()
-      setImageBase64(null)
-    } catch (error) {
-      setErrorText(getErrorMessage(error))
-    }
-  }
+  } = useCreateClotheForm()
 
   return (
     <ScrollView
@@ -243,7 +153,7 @@ const CreateClotheScreen = () => {
       {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
 
       <Pressable
-        onPress={handleSubmit(onSubmit)}
+        onPress={submitForm}
         style={[styles.button, isSubmitting ? styles.buttonDisabled : undefined]}
         disabled={isSubmitting}
       >
