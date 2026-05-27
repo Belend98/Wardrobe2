@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { signSchema, type SignInput } from './authSchema'
+import { signInSchema, type SignInInput } from './authSchema'
 import { signIn } from './authService'
 
 const SignInScreen = () => {
@@ -11,13 +11,13 @@ const SignInScreen = () => {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignInput>({
-    resolver: zodResolver(signSchema),
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
     defaultValues: { email: '', password: '' },
   })
   const [errorText, setErrorText] = useState<string | null>(null)
 
-  const onSubmit = async (data: SignInput) => {
+  const onSubmit = async (data: SignInInput) => {
     setErrorText(null)
     try {
       await signIn(data.email, data.password)

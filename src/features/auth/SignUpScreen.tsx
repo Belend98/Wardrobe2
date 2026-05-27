@@ -4,16 +4,16 @@ import {useState} from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { signUp } from './authService'
-import { signSchema, type SignInput } from './authSchema'
+import { signUpSchema, type SignUpInput } from './authSchema'
 
 const SignUpScreen = () => {
-  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignInput>({
-    resolver: zodResolver(signSchema),
+  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: { email: '', password: '', confirmPassword: '' },
   })
   const [errorText, setErrorText] = useState<string | null>(null)
 
-  const onSubmit = async (data: SignInput) => {
+  const onSubmit = async (data: SignUpInput) => {
     setErrorText(null)
     try {
       const result = await signUp(data.email, data.password)
@@ -69,7 +69,7 @@ const SignUpScreen = () => {
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
-            placeholder="Au moins 6 caracteres"
+            placeholder="Au moins 8 caracteres"
             style={styles.input}
           />
         )}

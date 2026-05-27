@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { signOut } from '../../auth/authService'
 import { createUserSchema, type CreateUserInput } from '../userForm/userSchema'
 import { createProfile } from '../userService'
 
@@ -50,7 +51,7 @@ const ProfileSetupScreen = () => {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut()
+      await signOut()
       router.replace('/(auth)/signup')
     } catch {
       Alert.alert('Erreur', 'Impossible de se deconnecter')
