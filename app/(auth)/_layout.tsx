@@ -22,7 +22,7 @@ export default function AuthLayout() {
       <Stack.Screen
         name="profile"
         options={{
-          title: 'Creer le profil',
+          title: 'Créer le profil',
         }}
       />
     </Stack>
