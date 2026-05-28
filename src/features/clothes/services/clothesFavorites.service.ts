@@ -1,7 +1,7 @@
 import { mapRowToModel } from '../clothes.mapper'
 import { deleteFavorite, findClothesByIds, findFavoritesByUserId, insertFavorite } from '../clothes.repository'
 import { resolveClotheImageUrl } from '../clothes.storage'
-import { getCurrentUserIdOrThrow } from './clothesAuth.service'
+import { getCurrentUserIdOrThrow } from '@/src/features/auth/authService'
 
 export async function getFavoriteClotheIds() {
   const userId = await getCurrentUserIdOrThrow()

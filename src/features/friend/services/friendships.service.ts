@@ -1,5 +1,5 @@
 import { supabase } from '@/src/utils/supabase'
-import { getCurrentUserIdOrThrow } from './friendAuth.service'
+import { getCurrentUserIdOrThrow } from '@/src/features/auth/authService'
 import type { FriendItem } from './friend.types'
 
 export async function getMyFriends(): Promise<FriendItem[]> {

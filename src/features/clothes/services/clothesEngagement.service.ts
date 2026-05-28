@@ -7,7 +7,7 @@ import {
   insertComment,
   insertLike,
 } from '../clothes.repository'
-import { getCurrentUserIdOrThrow } from './clothesAuth.service'
+import { getCurrentUserIdOrThrow } from '@/src/features/auth/authService'
 import type { ClotheCommentModel } from './clothes.types'
 
 export async function getLikesSnapshotForClothes(clotheIds: string[]) {

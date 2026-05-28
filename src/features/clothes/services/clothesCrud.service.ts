@@ -1,16 +1,17 @@
 import { getMyFriends } from '@/src/features/friend/friendrequestService'
+import { getCurrentUserIdOrThrow } from '@/src/features/auth/authService'
 import { mapRowToModel } from '../clothes.mapper'
 import {
   deleteClotheByIdAndUserId,
   findClotheByIdAndUserId,
   findClothesByUserId,
   findClothesByUserIds,
+  findUsernamesByUserIds,
   findPublicClothes,
   insertClothe,
   updateClotheByIdAndUserId,
 } from '../clothes.repository'
 import { deleteClotheImageIfStored, resolveClotheImageUrl, uploadClotheImageIfNeeded } from '../clothes.storage'
-import { getCurrentUserIdOrThrow } from './clothesAuth.service'
 import type { CreateClothesInput, UpdateClothesInput } from './clothes.types'
 
 export async function createMyClothe(input: CreateClothesInput) {
@@ -130,4 +131,14 @@ export async function getMyAndFriendsClothes() {
       imageUrl: await resolveClotheImageUrl(item.imageUrl),
     })),
   )
+}
+
+export async function getUsernamesByUserIds(userIds: string[]) {
+  const uniqueIds = Array.from(new Set(userIds))
+  const users = await findUsernamesByUserIds(uniqueIds)
+  const usernamesByUserId: Record<string, string> = {}
+  for (const user of users) {
+    usernamesByUserId[user.id as string] = (user.username as string | null) ?? 'Utilisateur'
+  }
+  return usernamesByUserId
 }

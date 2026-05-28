@@ -1,6 +1,6 @@
 export type { ClotheCommentModel, CreateClothesInput, UpdateClothesInput } from './services/clothes.types'
 
-export { getCurrentUserIdOrThrow } from './services/clothesAuth.service'
+export { getCurrentUserIdOrThrow } from '@/src/features/auth/authService'
 
 export {
   createMyClothe,
@@ -10,6 +10,7 @@ export {
   deleteMyClothe,
   getPublicClothes,
   getMyAndFriendsClothes,
+  getUsernamesByUserIds,
 } from './services/clothesCrud.service'
 
 export {

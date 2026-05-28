@@ -2,7 +2,7 @@ import type { ClothesModel } from '@/shared/model/clothesModel'
 import ClothesFilter from '@/shared/components/ClothesFilter'
 import ClotheCard from '@/src/features/clothes/component/ClotheCard'
 import { CLOTHES_CATEGORY_ALL } from '@/src/features/clothes/clothesCategories'
-import { getMyAndFriendsClothes } from '@/src/features/clothes/clothesService'
+import { getMyAndFriendsClothes, getUsernamesByUserIds } from '@/src/features/clothes/clothesService'
 import { useClotheEngagement } from '@/src/features/clothes/hooks/useClotheEngagement'
 import {
   hydrateDiscoverClothesCache,
@@ -14,6 +14,7 @@ import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 export default function DiscoverScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [clothes, setClothes] = useState<ClothesModel[]>([])
+  const [ownerNamesByUserId, setOwnerNamesByUserId] = useState<Record<string, string>>({})
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
     onError: (message) => Alert.alert('Erreur', message),
@@ -23,6 +24,8 @@ export default function DiscoverScreen() {
     try {
       const data = await getMyAndFriendsClothes()
       setClothes(data)
+      const ownerNames = await getUsernamesByUserIds(data.map((item) => item.userId))
+      setOwnerNamesByUserId(ownerNames)
       await persistDiscoverClothesCache(data)
     } catch (error) {
       const message =
@@ -56,7 +59,11 @@ export default function DiscoverScreen() {
   }
 
   const renderItem = ({ item }: { item: ClothesModel }) => (
-    <ClotheCard item={item} {...getCardEngagementProps(item.id)} />
+    <ClotheCard
+      item={item}
+      ownerName={ownerNamesByUserId[item.userId] ?? 'Utilisateur'}
+      {...getCardEngagementProps(item.id)}
+    />
   )
   const filteredClothes = clothes.filter(
     (item) => categoryFilter === CLOTHES_CATEGORY_ALL || item.category === categoryFilter,

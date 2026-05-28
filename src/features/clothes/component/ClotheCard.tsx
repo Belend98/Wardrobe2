@@ -6,6 +6,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
 type ClotheCardProps = {
   item: ClothesModel
+  ownerName?: string
   onDelete?: (id: string) => void
   onEdit?: (id: string) => void
   onToggleLike?: (id: string, shouldLike: boolean) => void
@@ -26,6 +27,7 @@ type ClotheCardProps = {
 
 export default function ClotheCard({
   item,
+  ownerName = 'Utilisateur',
   onDelete,
   onEdit,
   onToggleLike,
@@ -75,6 +77,7 @@ export default function ClotheCard({
             ) : null}
           </View>
         </View>
+        <Text style={styles.ownerText}>Publie par @{ownerName}</Text>
         <View style={styles.metaRow}>
           {item.color ? (
             <View style={styles.metaBadge}>
@@ -163,6 +166,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
+  },
+  ownerText: {
+    color: '#6B7280',
+    fontSize: 12,
+    fontWeight: '600',
   },
   metaBadge: {
     borderRadius: 999,

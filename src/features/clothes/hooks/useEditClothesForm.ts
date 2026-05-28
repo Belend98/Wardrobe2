@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router, useLocalSearchParams } from 'expo-router'
-import {useState, useEffect} from 'react'
-import { Alert } from 'react-native'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Alert } from 'react-native'
 
 import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
+import { CLOTHES_CATEGORIES } from '../clothesCategories'
 import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
 import { getMyClotheById, updateMyClothe } from '../clothesService'
-import { CLOTHES_CATEGORIES } from '../clothesCategories'
 
 function isClothesCategory(value: unknown): value is CreateClotheInput['category'] {
   return (
