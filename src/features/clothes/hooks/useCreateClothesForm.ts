@@ -1,15 +1,11 @@
 import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
+import { toErrorMessage } from '@/src/utils/errors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
 import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
 import { createMyClothe } from '../clothesService'
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message
-  return 'Une erreur est survenue.'
-}
 
 export function useCreateClotheForm() {
   const [errorText, setErrorText] = useState<string | null>(null)
@@ -49,7 +45,7 @@ export function useCreateClotheForm() {
       const media = await pickImageFromLibrary()
       setSelectedImage(media)
     } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error))
+      Alert.alert('Erreur', toErrorMessage(error))
     }
   }, [setSelectedImage])
 
@@ -58,7 +54,7 @@ export function useCreateClotheForm() {
       const media = await takePhotoWithCamera()
       setSelectedImage(media)
     } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error))
+      Alert.alert('Erreur', toErrorMessage(error))
     }
   }, [setSelectedImage])
 
@@ -81,7 +77,7 @@ export function useCreateClotheForm() {
         reset()
         setImageBase64(null)
       } catch (error) {
-        setErrorText(getErrorMessage(error))
+        setErrorText(toErrorMessage(error))
       }
     },
     [imageBase64, reset],

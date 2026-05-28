@@ -3,6 +3,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { toErrorMessage } from '@/src/utils/errors'
 import { signInSchema, type SignInInput } from './authSchema'
 import { signIn } from './authService'
 
@@ -24,8 +25,7 @@ const SignInScreen = () => {
       Alert.alert('Connexion reussie', 'Bienvenue.')
       router.replace('/')
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Une erreur est survenue.'
-      setErrorText(message)
+      setErrorText(toErrorMessage(error))
     }
   }
 

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
 
 import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/features/camera/camera.service'
+import { toErrorMessage } from '@/src/utils/errors'
 import { CLOTHES_CATEGORIES } from '../clothesCategories'
 import { createClotheSchema, type CreateClotheInput } from '../clothesSchema'
 import { getMyClotheById, updateMyClothe } from '../clothesService'
@@ -14,10 +15,6 @@ function isClothesCategory(value: unknown): value is CreateClotheInput['category
     typeof value === 'string' &&
     CLOTHES_CATEGORIES.includes(value as (typeof CLOTHES_CATEGORIES)[number])
   )
-}
-
-function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : 'Une erreur est survenue.'
 }
 
 export function useEditClotheForm() {
@@ -73,7 +70,7 @@ export function useEditClotheForm() {
         })
       } catch (error) {
         if (!mounted) return
-        setErrorText(getErrorMessage(error))
+        setErrorText(toErrorMessage(error))
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -97,7 +94,7 @@ export function useEditClotheForm() {
         shouldDirty: true,
       })
     } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error))
+      Alert.alert('Erreur', toErrorMessage(error))
     }
   }
 
@@ -112,7 +109,7 @@ export function useEditClotheForm() {
         shouldDirty: true,
       })
     } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error))
+      Alert.alert('Erreur', toErrorMessage(error))
     }
   }
 
@@ -135,7 +132,7 @@ export function useEditClotheForm() {
       Alert.alert('Succes', 'Vetement modifie.')
       router.back()
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error))
     }
   })
 

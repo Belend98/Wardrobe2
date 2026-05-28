@@ -3,13 +3,9 @@ import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
+import { toErrorMessage } from '@/src/utils/errors'
 import { createUserSchema, type CreateUserInput } from '../userForm/userSchema'
 import { getCurrentUserProfileOrThrow, updateCurrentUserProfile } from '../userService'
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message
-  return 'Impossible de modifier le profil.'
-}
 
 export function useEditUserProfile() {
   const [isLoading, setIsLoading] = useState(true)
@@ -43,7 +39,7 @@ export function useEditUserProfile() {
           bio: profile.bio ?? '',
         })
       } catch (error) {
-        if (mounted) setErrorText(getErrorMessage(error))
+        if (mounted) setErrorText(toErrorMessage(error, 'Impossible de modifier le profil.'))
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -66,7 +62,7 @@ export function useEditUserProfile() {
       Alert.alert('Succes', 'Profil mis a jour.')
       router.back()
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error, 'Impossible de modifier le profil.'))
     }
   }
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { toErrorMessage } from '@/src/utils/errors'
 import {
   getMyFriends,
   getReceivedFriendRequests,
@@ -10,11 +11,6 @@ import {
   type ReceivedFriendRequest,
 } from './friendrequestService'
 import { searchUserByUsername, type SearchedUser } from './searchService'
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message
-  return 'Erreur pendant la recherche.'
-}
 
 export default function FriendsScreen() {
   const [query, setQuery] = useState('')
@@ -37,7 +33,7 @@ export default function FriendsScreen() {
       const data = await getReceivedFriendRequests()
       setReceivedRequests(data)
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
     } finally {
       setIsLoadingRequests(false)
     }
@@ -53,7 +49,7 @@ export default function FriendsScreen() {
       const data = await getMyFriends()
       setFriends(data)
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
     } finally {
       setIsLoadingFriends(false)
     }
@@ -88,7 +84,7 @@ export default function FriendsScreen() {
       setResult(foundUser)
       setSearchDone(true)
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
     } finally {
       setIsSearching(false)
     }
@@ -102,7 +98,7 @@ export default function FriendsScreen() {
       await sendFriendRequest(result.id)
       Alert.alert('Succes', `Demande envoyee a @${result.username}.`)
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
     } finally {
       setIsSendingRequest(false)
     }
@@ -118,7 +114,7 @@ export default function FriendsScreen() {
       }
       Alert.alert('Succes', decision === 'accepted' ? 'Demande acceptee.' : 'Demande rejetee.')
     } catch (error) {
-      setErrorText(getErrorMessage(error))
+      setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
     } finally {
       setPendingActionId(null)
     }
@@ -137,7 +133,7 @@ export default function FriendsScreen() {
             setFriends((prev) => prev.filter((item) => item.id !== friend.id))
             Alert.alert('Succes', 'Ami supprime.')
           } catch (error) {
-            setErrorText(getErrorMessage(error))
+            setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
           } finally {
             setRemovingFriendId(null)
           }
