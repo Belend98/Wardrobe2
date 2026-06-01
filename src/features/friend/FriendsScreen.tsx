@@ -1,6 +1,6 @@
+import { toErrorMessage } from '@/src/utils/errors'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import { toErrorMessage } from '@/src/utils/errors'
 import {
   getMyFriends,
   getReceivedFriendRequests,
@@ -112,7 +112,7 @@ export default function FriendsScreen() {
       if (decision === 'accepted') {
         await loadMyFriends()
       }
-      Alert.alert('Succes', decision === 'accepted' ? 'Demande acceptee.' : 'Demande rejetee.')
+      Alert.alert('Succes', decision === 'accepted' ? 'Demande acceptée.' : 'Demande rejetée.')
     } catch (error) {
       setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
     } finally {

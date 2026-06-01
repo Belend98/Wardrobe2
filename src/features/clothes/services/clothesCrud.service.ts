@@ -52,7 +52,7 @@ export async function getMyClothes() {
 export async function getMyClotheById(id: string) {
   const userId = await getCurrentUserIdOrThrow()
   const row = await findClotheByIdAndUserId(id, userId)
-  if (!row) throw new Error('Vetement introuvable ou non autorise.')
+  if (!row) throw new Error('Vetement introuvable ou non autorisé.')
 
   const mapped = mapRowToModel(row)
   return {
@@ -64,7 +64,7 @@ export async function getMyClotheById(id: string) {
 export async function updateMyClothe(id: string, input: UpdateClothesInput) {
   const userId = await getCurrentUserIdOrThrow()
   const existing = await findClotheByIdAndUserId(id, userId)
-  if (!existing) throw new Error('Vetement introuvable ou non autorise.')
+  if (!existing) throw new Error('Vêtement introuvable ou non autorisé.')
 
   const payload: Record<string, unknown> = { updated_at: new Date().toISOString() }
   if (input.name !== undefined) payload.name = input.name

@@ -25,8 +25,8 @@ export default function EditClotheScreen() {
 
   return (
     <ClotheForm
-      title="Modifier un vetement"
-      subtitle="Mets a jour les informations de ta piece."
+      title="Modifier un vêtement"
+      subtitle="Mets a jour les informations de ta pièce."
       submitLabel="Enregistrer"
       submitLoadingLabel="Enregistrement..."
       control={control}

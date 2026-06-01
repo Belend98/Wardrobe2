@@ -51,7 +51,7 @@ export function useEditClotheForm() {
 
     async function loadClothe() {
       if (!id) {
-        setErrorText('ID du vetement manquant.')
+        setErrorText('ID du vêtement manquant.')
         setIsLoading(false)
         return
       }
