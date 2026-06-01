@@ -15,7 +15,7 @@ const CreateClotheScreen = () => {
   return (
     <ClotheForm
       title="Publier un vetement"
-      subtitle="Partage une piece avec la communaute."
+      subtitle="Partage une piece avec la communauté."
       submitLabel="Publier"
       submitLoadingLabel="Publication..."
       control={control}

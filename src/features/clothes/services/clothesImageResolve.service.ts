@@ -10,7 +10,7 @@ export async function resolveClotheImageUrl(imageUrl: string) {
     .createSignedUrl(privateLocation.filePath, 60 * 60)
 
   if (error) throw error
-  if (!data.signedUrl) throw new Error("Impossible de generer l'URL signee de l'image.")
+  if (!data.signedUrl) throw new Error("Impossible de generer l'URL signée de l'image.")
 
   return data.signedUrl
 }

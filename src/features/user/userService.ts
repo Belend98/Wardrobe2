@@ -40,7 +40,7 @@ export async function getCurrentUserProfileOrThrow() {
   } = await supabase.auth.getUser()
 
   if (userError) throw userError
-  if (!user) throw new Error('Utilisateur non connecte.')
+  if (!user) throw new Error('Utilisateur non connecté.')
 
   const profile = await getMyProfile(user.id)
   if (!profile) throw new Error('Profil introuvable.')

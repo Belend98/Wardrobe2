@@ -73,7 +73,7 @@ export function useCreateClotheForm() {
           isPublic: data.isPublic,
         })
 
-        Alert.alert('Succes', 'Vetement publie.')
+        Alert.alert('Succès', 'Vêtement publié.')
         reset()
         setImageBase64(null)
       } catch (error) {

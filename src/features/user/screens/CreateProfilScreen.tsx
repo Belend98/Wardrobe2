@@ -74,7 +74,7 @@ const ProfileSetupScreen = () => {
 
     try {
       await createProfile(user.id, data)
-      Alert.alert('Profil cree', 'Ton profil est pret.')
+      Alert.alert('Profil crée', 'Ton profil est pret.')
       router.replace('/(tabs)/discover')
     } catch (error) {
       setErrorText(toReadableProfileError(error))
@@ -83,7 +83,7 @@ const ProfileSetupScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Complete ton profil</Text>
+      <Text style={styles.title}>Complète ton profil</Text>
       <Text style={styles.subtitle}>Ajoute quelques infos avant de continuer.</Text>
 
       <Text style={styles.label}>Nom d&apos;utilisateur</Text>

@@ -29,7 +29,7 @@ export default function DiscoverScreen() {
       await persistDiscoverClothesCache(data)
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Impossible de charger les vetements.'
+        error instanceof Error ? error.message : 'Impossible de charger les vêtements.'
       Alert.alert('Erreur', message)
     }
   }, [])

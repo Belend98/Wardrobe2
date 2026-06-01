@@ -174,7 +174,7 @@ export default function FriendsScreen() {
       {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Demandes recues</Text>
+        <Text style={styles.sectionTitle}>Demandes reçues</Text>
         {isLoadingRequests ? (
           <Text style={styles.emptyText}>Chargement...</Text>
         ) : receivedRequests.length === 0 ? (

@@ -32,7 +32,7 @@ export async function sendFriendRequest(receiverId: string) {
 
   if (existingPendingError) throw existingPendingError
   if (existingPending && existingPending.length > 0) {
-    throw new Error('Une demande est deja en cours entre vous.')
+    throw new Error('Une demande est déjà en cours entre vous.')
   }
 
   const { error } = await supabase.from('friend_requests').insert({

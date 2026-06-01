@@ -41,7 +41,7 @@ export async function getCurrentUserIdOrThrow() {
   } = await supabase.auth.getUser()
 
   if (error) throw error
-  if (!user) throw new Error('Utilisateur non connecte.')
+  if (!user) throw new Error('Utilisateur non connecté.')
 
   return user.id
 }

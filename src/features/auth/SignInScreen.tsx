@@ -22,7 +22,7 @@ const SignInScreen = () => {
     setErrorText(null)
     try {
       await signIn(data.email, data.password)
-      Alert.alert('Connexion reussie', 'Bienvenue.')
+      Alert.alert('Connexion réussie', 'Bienvenue.')
       router.replace('/')
     } catch (error) {
       setErrorText(toErrorMessage(error))
@@ -83,7 +83,7 @@ const SignInScreen = () => {
       </Pressable>
 
       <Pressable onPress={() => router.replace('/(auth)/signup')} style={styles.linkButton}>
-        <Text style={styles.linkText}>Pas de compte ? Creer un compte</Text>
+        <Text style={styles.linkText}>Pas de compte ? Créer un compte</Text>
       </Pressable>
     </View>
   )

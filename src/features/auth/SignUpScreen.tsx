@@ -19,13 +19,13 @@ const SignUpScreen = () => {
     try {
       const result = await signUp(data.email, data.password)
       if (result.session) {
-        Alert.alert('Compte cree', 'Inscription reussie.')
+        Alert.alert('Compte crée', 'Inscription réussie.')
         router.replace('/(auth)/profile')
         return
       }
       Alert.alert(
-        'Verifie ton email',
-        'Ton compte est cree. Verifie ta boite mail pour confirmer ton adresse.',
+        'Vérifie ton email',
+        'Ton compte est crée. Vérifie ta boite mail pour confirmer ton adresse.',
       )
       
     } catch (error) {
@@ -35,7 +35,7 @@ const SignUpScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Creer un compte</Text>
+      <Text style={styles.title}>Créer un compte</Text>
       <Text style={styles.subtitle}>Entre ton email et ton mot de passe.</Text>
 
       <Text style={styles.label}>Email</Text>
@@ -106,7 +106,7 @@ const SignUpScreen = () => {
       </Pressable>
 
       <Pressable onPress={() => router.replace('/(auth)/signin')} style={styles.linkButton}>
-        <Text style={styles.linkText}>Deja un compte ? Se connecter</Text>
+        <Text style={styles.linkText}>Déja un compte ? Se connecter</Text>
       </Pressable>
     </View>
   )

@@ -19,14 +19,14 @@ function mapAsset(asset: ImagePicker.ImagePickerAsset): PickedMedia {
 export async function requestMediaLibraryPermissionOrThrow() {
   const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
   if (!permission.granted) {
-    throw new Error("Permission galerie refusee. Autorise l'acces aux photos/videos.")
+    throw new Error("Permission galerie refusée. Autorisez l'accès aux photos/videos.")
   }
 }
 
 export async function requestCameraPermissionOrThrow() {
   const permission = await ImagePicker.requestCameraPermissionsAsync()
   if (!permission.granted) {
-    throw new Error('Permission camera refusee.')
+    throw new Error('Permission camera refusée.')
   }
 }
 

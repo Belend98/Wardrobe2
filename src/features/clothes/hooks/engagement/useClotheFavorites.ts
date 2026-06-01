@@ -38,7 +38,7 @@ export function useClotheFavorites({
           else next.add(id)
           return next
         })
-        const message = error instanceof Error ? error.message : 'Impossible de mettre a jour le favori.'
+        const message = error instanceof Error ? error.message : 'Impossible de mettre à jour le favori.'
         onError?.(message)
       } finally {
         setFavoriteLoadingByClotheId((prev) => ({ ...prev, [id]: false }))
