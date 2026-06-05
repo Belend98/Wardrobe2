@@ -1,3 +1,3 @@
-import FriendsScreen from '@/src/features/friend/FriendsScreen'
+import FriendsScreen from '@/src/presentation/screens/friend/FriendsScreen'
 
 export default FriendsScreen

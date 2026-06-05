@@ -1,0 +1,62 @@
+import type { ClotheCommentModel } from '@/src/application/services/clothesService'
+import { getEngagementSnapshotForClothes } from '@/src/application/services/clothesService'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+type UseClotheSnapshotOptions = {
+  onError?: (message: string) => void
+}
+
+export function useClotheSnapshot(clotheIds: string[], options: UseClotheSnapshotOptions = {}) {
+  const { onError } = options
+  const onErrorRef = useRef(onError)
+  const [likesCountByClotheId, setLikesCountByClotheId] = useState<Record<string, number>>({})
+  const [likedClotheIds, setLikedClotheIds] = useState<Set<string>>(new Set())
+  const [favoriteClotheIds, setFavoriteClotheIds] = useState<Set<string>>(new Set())
+  const [commentsByClotheId, setCommentsByClotheId] = useState<Record<string, ClotheCommentModel[]>>({})
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [userNamesByUserId, setUserNamesByUserId] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    onErrorRef.current = onError
+  }, [onError])
+
+  const loadEngagement = useCallback(async () => {
+    try {
+      const snapshot = await getEngagementSnapshotForClothes(clotheIds)
+      setLikesCountByClotheId(snapshot.likesCountByClotheId)
+      setLikedClotheIds(snapshot.likedClotheIds)
+      setFavoriteClotheIds(snapshot.favoriteClotheIds)
+      setCommentsByClotheId(snapshot.commentsByClotheId)
+      setCurrentUserId(snapshot.currentUserId)
+      setUserNamesByUserId(snapshot.userNamesByUserId)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Impossible de charger les interactions.'
+      onErrorRef.current?.(message)
+    }
+  }, [clotheIds])
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      if (!mounted) return
+      await loadEngagement()
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [loadEngagement])
+
+  return {
+    likesCountByClotheId,
+    setLikesCountByClotheId,
+    likedClotheIds,
+    setLikedClotheIds,
+    favoriteClotheIds,
+    setFavoriteClotheIds,
+    commentsByClotheId,
+    setCommentsByClotheId,
+    currentUserId,
+    userNamesByUserId,
+    loadEngagement,
+  }
+}

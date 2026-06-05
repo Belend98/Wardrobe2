@@ -1,3 +1,3 @@
-import DiscoverScreen from '@/src/features/clothes/screens/DiscoverScreen'
+import DiscoverScreen from '@/src/presentation/screens/clothes/DiscoverScreen'
 
 export default DiscoverScreen

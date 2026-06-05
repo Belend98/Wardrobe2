@@ -1,3 +1,3 @@
-import PersonnalScreen from '@/src/features/user/screens/PersonnalScreen'
+import PersonnalScreen from '@/src/presentation/screens/user/PersonnalScreen'
 
 export default PersonnalScreen

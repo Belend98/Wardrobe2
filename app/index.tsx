@@ -1,4 +1,4 @@
-import { useInitialRoute } from '@/src/features/auth/useInitialRoute'
+import { useInitialRoute } from '@/src/presentation/hooks/auth/useInitialRoute'
 import { ActivityIndicator, View } from 'react-native'
 
 export default function Index() {

@@ -1,3 +1,3 @@
-import EditClotheScreen from '@/src/features/clothes/screens/EditClotheScreen'
+import EditClotheScreen from '@/src/presentation/screens/clothes/EditClotheScreen'
 
 export default EditClotheScreen

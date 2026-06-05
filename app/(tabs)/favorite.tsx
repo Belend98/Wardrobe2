@@ -1,3 +1,3 @@
-import FavoriteScreen from '@/src/features/clothes/screens/FavoriteScreen'
+import FavoriteScreen from '@/src/presentation/screens/clothes/FavoriteScreen'
 
 export default FavoriteScreen

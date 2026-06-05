@@ -1,3 +1,3 @@
-import CreateClotheScreen from '@/src/features/clothes/screens/CreateClotheScreen'
+import CreateClotheScreen from '@/src/presentation/screens/clothes/CreateClotheScreen'
 
 export default CreateClotheScreen

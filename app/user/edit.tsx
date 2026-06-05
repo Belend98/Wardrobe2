@@ -1,3 +1,3 @@
-import EditUserScreen from '@/src/features/user/screens/EditUserScreen'
+import EditUserScreen from '@/src/presentation/screens/user/EditUserScreen'
 
 export default EditUserScreen
