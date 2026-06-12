@@ -7,11 +7,11 @@ import {
   insertComment,
   insertLike,
 } from '@/src/infrastructure/supabase/clothingSupabaseRepository'
-import { getCurrentUserIdOrThrow } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
 
 export async function getLikesSnapshotForClothes(clotheIds: string[]) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const likes = await findLikesByClotheIds(clotheIds)
 
   const likesCountByClotheId: Record<string, number> = {}
@@ -26,7 +26,7 @@ export async function getLikesSnapshotForClothes(clotheIds: string[]) {
 }
 
 export async function getEngagementSnapshotForClothes(clotheIds: string[]) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const [likes, favorites, comments] = await Promise.all([
     findLikesByClotheIds(clotheIds),
     findFavoritesByUserIdAndClotheIds(userId, clotheIds),
@@ -73,7 +73,7 @@ export async function getEngagementSnapshotForClothes(clotheIds: string[]) {
 }
 
 export async function likeClothe(clotheId: string, userIdParam?: string) {
-  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
+  const userId = userIdParam ?? (await authService.getCurrentUserIdOrThrow())
   try {
     await insertLike({ clothe_id: clotheId, user_id: userId })
   } catch (error) {
@@ -83,12 +83,12 @@ export async function likeClothe(clotheId: string, userIdParam?: string) {
 }
 
 export async function unlikeClothe(clotheId: string, userIdParam?: string) {
-  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
+  const userId = userIdParam ?? (await authService.getCurrentUserIdOrThrow())
   await deleteLike({ clothe_id: clotheId, user_id: userId })
 }
 
 export async function addCommentToClothe(clotheId: string, content: string, userIdParam?: string) {
-  const userId = userIdParam ?? (await getCurrentUserIdOrThrow())
+  const userId = userIdParam ?? (await authService.getCurrentUserIdOrThrow())
   const trimmed = content.trim()
   if (!trimmed) throw new Error('Le commentaire ne peut pas etre vide.')
 

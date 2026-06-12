@@ -1,5 +1,5 @@
 import { getMyFriends } from '@/src/application/services/friendrequestService'
-import { getCurrentUserIdOrThrow } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import { mapRowToModel } from '@/src/infrastructure/supabase/clothes.mapper'
 import {
   deleteClotheByIdAndUserId,
@@ -15,7 +15,7 @@ import { deleteClotheImageIfStored, resolveClotheImageUrl, uploadClotheImageIfNe
 import type { CreateClothesInput, UpdateClothesInput } from '@/src/shared/types/clothes.types'
 
 export async function createMyClothe(input: CreateClothesInput) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const isPublic = input.isPublic ?? true
   const publicImageUrl = await uploadClotheImageIfNeeded(
     userId,
@@ -38,7 +38,7 @@ export async function createMyClothe(input: CreateClothesInput) {
 }
 
 export async function getMyClothes() {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const rows = await findClothesByUserId(userId)
   const mapped = rows.map(mapRowToModel)
   return Promise.all(
@@ -50,7 +50,7 @@ export async function getMyClothes() {
 }
 
 export async function getMyClotheById(id: string) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const row = await findClotheByIdAndUserId(id, userId)
   if (!row) throw new Error('Vetement introuvable ou non autorisé.')
 
@@ -62,7 +62,7 @@ export async function getMyClotheById(id: string) {
 }
 
 export async function updateMyClothe(id: string, input: UpdateClothesInput) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const existing = await findClotheByIdAndUserId(id, userId)
   if (!existing) throw new Error('Vêtement introuvable ou non autorisé.')
 
@@ -97,7 +97,7 @@ export async function updateMyClothe(id: string, input: UpdateClothesInput) {
 }
 
 export async function deleteMyClothe(id: string) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const clothe = await findClotheByIdAndUserId(id, userId)
   if (!clothe) throw new Error('Vetement introuvable ou non autorise.')
 
@@ -117,7 +117,7 @@ export async function getPublicClothes() {
 }
 
 export async function getMyAndFriendsClothes() {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
   const friends = await getMyFriends()
   const userIds = Array.from(new Set([userId, ...friends.map((friend) => friend.id)]))
   const rows = await findClothesByUserIds(userIds)

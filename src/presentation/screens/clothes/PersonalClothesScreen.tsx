@@ -1,7 +1,7 @@
 import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
-import ClothesGrid from '@/src/presentation/components/clothes/ClothesGrid'
+import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
 import { usePersonalClothesScreen } from '@/src/presentation/hooks/clothes/usePersonalClothesScreen'
-import {StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 export default function PersonalClothesScreen() {
   const {
@@ -28,16 +28,33 @@ export default function PersonalClothesScreen() {
         <ClothesFilter categoryFilter={categoryFilter} onSelectCategory={setCategoryFilter} />
       </View>
 
-      <ClothesGrid
-        isLoading={isLoading}
-        isRefreshing={isRefreshing}
-        clothes={clothes}
-        deletingId={deletingId}
-        onRefresh={handleRefresh}
-        onDelete={confirmDelete}
-        onEdit={handleEdit}
-        getCardEngagementProps={getCardEngagementProps}
-      />
+      {isLoading ? (
+        <View style={styles.centerState}>
+          <Text style={styles.stateText}>Chargement...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={clothes}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ClotheCard
+              item={item}
+              onDelete={confirmDelete}
+              onEdit={handleEdit}
+              isDeleting={deletingId === item.id}
+              {...getCardEngagementProps(item.id)}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          ListEmptyComponent={
+            <View style={styles.centerState}>
+              <Text style={styles.stateText}>Tu n&apos;as pas encore publie de vetement.</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   )
 }
@@ -67,6 +84,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     color: '#111827',
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 12,
+  },
+  centerState: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  stateText: {
+    color: '#6B7280',
   },
   subtitle: {
     marginTop: 8,

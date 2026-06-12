@@ -4,7 +4,7 @@ import {useState} from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { toErrorMessage } from '@/src/shared/utils/errors'
-import { signUp } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import { signUpSchema, type SignUpInput } from '@/src/domain/rules/authSchema'
 
 const SignUpScreen = () => {
@@ -17,8 +17,8 @@ const SignUpScreen = () => {
   const onSubmit = async (data: SignUpInput) => {
     setErrorText(null)
     try {
-      const result = await signUp(data.email, data.password)
-      if (result.session) {
+      const result = await authService.signUp(data.email, data.password)
+      if (result.hasSession) {
         Alert.alert('Compte crée', 'Inscription réussie.')
         router.replace('/(auth)/profile')
         return

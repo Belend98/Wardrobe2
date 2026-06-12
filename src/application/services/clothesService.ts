@@ -1,7 +1,5 @@
 export type { ClotheCommentModel, CreateClothesInput, UpdateClothesInput } from '@/src/shared/types/clothes.types'
 
-export { getCurrentUserIdOrThrow } from '@/src/application/services/authService'
-
 export {
   createMyClothe,
   getMyClothes,

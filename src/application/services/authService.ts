@@ -1,47 +1,34 @@
-import { supabase } from '@/src/infrastructure/supabase/client'
+import type { AuthRepository } from '@/src/domain/repositories/AuthRepository'
 
-export async function signUp(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  })
+export class AuthService {
+  constructor(private readonly authRepository: AuthRepository) {}
 
-  if (error) {
-    throw error
+  signUp(email: string, password: string) {
+    return this.authRepository.signUp(email, password)
   }
 
-  return data
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-
-  if (error) {
-    console.warn (error.message)
-  }
-}
-
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
-    throw error
+  signIn(email: string, password: string) {
+    return this.authRepository.signIn(email, password)
   }
 
-  return data
-}
+  signOut() {
+    return this.authRepository.signOut()
+  }
 
-export async function getCurrentUserIdOrThrow() {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
+  getCurrentUser() {
+    return this.authRepository.getCurrentUser()
+  }
 
-  if (error) throw error
-  if (!user) throw new Error('Utilisateur non connecté.')
+  async getCurrentUserOrThrow() {
+    const user = await this.getCurrentUser()
 
-  return user.id
+    if (!user) throw new Error('Utilisateur non connecté.')
+
+    return user
+  }
+
+  async getCurrentUserIdOrThrow() {
+    const user = await this.getCurrentUserOrThrow()
+    return user.id
+  }
 }

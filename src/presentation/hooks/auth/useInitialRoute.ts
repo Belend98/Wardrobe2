@@ -1,5 +1,5 @@
 import { getMyProfile } from '@/src/application/services/userService'
-import { supabase } from '@/src/infrastructure/supabase/client'
+import { authService } from '@/src/composition/auth'
 import { router } from 'expo-router'
 import { useEffect } from 'react'
 
@@ -7,16 +7,14 @@ export function useInitialRoute() {
   useEffect(() => {
     const handleInitialRedirect = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+        const user = await authService.getCurrentUser()
 
-        if (!session?.user) {
+        if (!user) {
           router.replace('/(auth)/signup')
           return
         }
 
-        const profile = await getMyProfile(session.user.id)
+        const profile = await getMyProfile(user.id)
         if (profile) {
           router.replace('/(tabs)/discover')
         } else {

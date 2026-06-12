@@ -1,4 +1,5 @@
 import type { CreateUserModel } from '@/src/domain/entities/User'
+import { authService } from '@/src/composition/auth'
 import { deleteClotheImageIfStored } from '@/src/infrastructure/storage/clothes.storage'
 import { supabase } from '@/src/infrastructure/supabase/client'
 
@@ -34,13 +35,7 @@ export async function getMyProfile(userId: string) {
 }
 
 export async function getCurrentUserProfileOrThrow() {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError) throw userError
-  if (!user) throw new Error('Utilisateur non connecté.')
+  const user = await authService.getCurrentUserOrThrow()
 
   const profile = await getMyProfile(user.id)
   if (!profile) throw new Error('Profil introuvable.')
@@ -55,13 +50,7 @@ export async function getCurrentUserProfileOrThrow() {
 }
 
 export async function updateCurrentUserProfile(data: CreateUserModel) {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError) throw userError
-  if (!user) throw new Error('Utilisateur non connecte.')
+  const user = await authService.getCurrentUserOrThrow()
 
   const { error } = await supabase
     .from('users')
@@ -75,13 +64,7 @@ export async function updateCurrentUserProfile(data: CreateUserModel) {
 }
 
 export async function getCurrentUserClotheImageUrls() {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError) throw userError
-  if (!user) throw new Error('Utilisateur non connecte.')
+  const user = await authService.getCurrentUserOrThrow()
 
   const { data, error } = await supabase
     .from('clothes')

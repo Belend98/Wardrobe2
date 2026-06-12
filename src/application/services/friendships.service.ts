@@ -1,9 +1,9 @@
 import { supabase } from '@/src/infrastructure/supabase/client'
-import { getCurrentUserIdOrThrow } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import type { FriendItem } from '@/src/shared/types/friend.types'
 
 export async function getMyFriends(): Promise<FriendItem[]> {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
 
   const { data: outgoingRows, error: outgoingError } = await supabase
     .from('friendships')
@@ -41,7 +41,7 @@ export async function getMyFriends(): Promise<FriendItem[]> {
 }
 
 export async function removeFriend(friendId: string) {
-  const userId = await getCurrentUserIdOrThrow()
+  const userId = await authService.getCurrentUserIdOrThrow()
 
   if (friendId === userId) {
     throw new Error("Tu ne peux pas te supprimer toi-meme de tes amis.")

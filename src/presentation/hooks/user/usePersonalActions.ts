@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
-import { signOut } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import { deleteCurrentUserAccountData } from '@/src/application/services/userService'
 
 export function usePersonalActions() {
@@ -11,7 +11,7 @@ export function usePersonalActions() {
   const handleSignOut = useCallback(async () => {
     try {
       setIsSigningOut(true)
-      await signOut()
+      await authService.signOut()
       router.replace('/(auth)/signup')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Impossible de se deconnecter.'
@@ -35,7 +35,7 @@ export function usePersonalActions() {
               setIsDeletingAccount(true)
               await deleteCurrentUserAccountData()
               try {
-                await signOut()
+                await authService.signOut()
               } catch {
                 // La session peut deja etre invalide apres suppression dans auth.users.
               }

@@ -1,10 +1,9 @@
-import { supabase } from '@/src/infrastructure/supabase/client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { signOut } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import { createUserSchema, type CreateUserInput } from '@/src/domain/rules/userSchema'
 import { createProfile } from '@/src/application/services/userService'
 
@@ -51,7 +50,7 @@ const ProfileSetupScreen = () => {
 
   const handleSignOut = async () => {
     try {
-      await signOut()
+      await authService.signOut()
       router.replace('/(auth)/signup')
     } catch {
       Alert.alert('Erreur', 'Impossible de se deconnecter')
@@ -61,12 +60,9 @@ const ProfileSetupScreen = () => {
   const onSubmit = async (data: CreateUserInput) => {
     setErrorText(null)
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
+    const user = await authService.getCurrentUser()
 
-    if (userError || !user) {
+    if (!user) {
       setErrorText('Session invalide. Reconnecte-toi.')
       router.replace('/(auth)/signup')
       return

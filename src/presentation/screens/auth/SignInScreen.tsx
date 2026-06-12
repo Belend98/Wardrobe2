@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { toErrorMessage } from '@/src/shared/utils/errors'
 import { signInSchema, type SignInInput } from '@/src/domain/rules/authSchema'
-import { signIn } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 
 const SignInScreen = () => {
   const {
@@ -21,7 +21,7 @@ const SignInScreen = () => {
   const onSubmit = async (data: SignInInput) => {
     setErrorText(null)
     try {
-      await signIn(data.email, data.password)
+      await authService.signIn(data.email, data.password)
       Alert.alert('Connexion réussie', 'Bienvenue.')
       router.replace('/')
     } catch (error) {

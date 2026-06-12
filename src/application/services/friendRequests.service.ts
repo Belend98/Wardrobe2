@@ -1,9 +1,9 @@
 import { supabase } from '@/src/infrastructure/supabase/client'
-import { getCurrentUserIdOrThrow } from '@/src/application/services/authService'
+import { authService } from '@/src/composition/auth'
 import type { ReceivedFriendRequest } from '@/src/shared/types/friend.types'
 
 export async function sendFriendRequest(receiverId: string) {
-  const senderId = await getCurrentUserIdOrThrow()
+  const senderId = await authService.getCurrentUserIdOrThrow()
 
   if (senderId === receiverId) {
     throw new Error("Tu ne peux pas t'ajouter toi-meme.")
@@ -45,7 +45,7 @@ export async function sendFriendRequest(receiverId: string) {
 }
 
 export async function getReceivedFriendRequests(): Promise<ReceivedFriendRequest[]> {
-  const receiverId = await getCurrentUserIdOrThrow()
+  const receiverId = await authService.getCurrentUserIdOrThrow()
 
   const { data: requests, error: requestsError } = await supabase
     .from('friend_requests')
@@ -92,7 +92,7 @@ export async function getReceivedFriendRequests(): Promise<ReceivedFriendRequest
 }
 
 export async function respondToFriendRequest(requestId: string, decision: 'accepted' | 'rejected') {
-  const receiverId = await getCurrentUserIdOrThrow()
+  const receiverId = await authService.getCurrentUserIdOrThrow()
 
   const { data: requestRow, error: requestRowError } = await supabase
     .from('friend_requests')
