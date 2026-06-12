@@ -1,5 +1,5 @@
-import { getMyProfile } from '@/src/application/services/userService'
 import { authService } from '@/src/composition/auth'
+import { userService } from '@/src/composition/user'
 import { router } from 'expo-router'
 import { useEffect } from 'react'
 
@@ -14,7 +14,7 @@ export function useInitialRoute() {
           return
         }
 
-        const profile = await getMyProfile(user.id)
+        const profile = await userService.getMyProfile(user.id)
         if (profile) {
           router.replace('/(tabs)/discover')
         } else {

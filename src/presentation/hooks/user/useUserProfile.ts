@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
-import { getCurrentUserProfileOrThrow } from '@/src/application/services/userService'
+import { userService } from '@/src/composition/user'
 
 interface UserProfile {
   username: string
@@ -15,7 +15,7 @@ export function useUserProfile() {
 
   const loadProfile = useCallback(async () => {
     try {
-      const data = await getCurrentUserProfileOrThrow()
+      const data = await userService.getCurrentUserProfileOrThrow()
       setProfile({
         username: data.username,
         bio: data.bio,

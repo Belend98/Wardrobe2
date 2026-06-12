@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
 import { authService } from '@/src/composition/auth'
-import { deleteCurrentUserAccountData } from '@/src/application/services/userService'
+import { userService } from '@/src/composition/user'
 
 export function usePersonalActions() {
   const [isSigningOut, setIsSigningOut] = useState(false)
@@ -33,7 +33,7 @@ export function usePersonalActions() {
           onPress: async () => {
             try {
               setIsDeletingAccount(true)
-              await deleteCurrentUserAccountData()
+              await userService.deleteCurrentUserAccountData()
               try {
                 await authService.signOut()
               } catch {

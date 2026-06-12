@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { authService } from '@/src/composition/auth'
 import { createUserSchema, type CreateUserInput } from '@/src/domain/rules/userSchema'
-import { createProfile } from '@/src/application/services/userService'
+import { userService } from '@/src/composition/user'
 
 type SupabaseLikeError = {
   code?: string
@@ -69,7 +69,7 @@ const ProfileSetupScreen = () => {
     }
 
     try {
-      await createProfile(user.id, data)
+      await userService.createProfile(user.id, data)
       Alert.alert('Profil crée', 'Ton profil est pret.')
       router.replace('/(tabs)/discover')
     } catch (error) {

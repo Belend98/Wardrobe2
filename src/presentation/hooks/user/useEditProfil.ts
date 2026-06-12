@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
 import { toErrorMessage } from '@/src/shared/utils/errors'
 import { createUserSchema, type CreateUserInput } from '@/src/domain/rules/userSchema'
-import { getCurrentUserProfileOrThrow, updateCurrentUserProfile } from '@/src/application/services/userService'
+import { userService } from '@/src/composition/user'
 
 export function useEditUserProfile() {
   const [isLoading, setIsLoading] = useState(true)
@@ -30,7 +30,7 @@ export function useEditUserProfile() {
 
     ;(async () => {
       try {
-        const profile = await getCurrentUserProfileOrThrow()
+        const profile = await userService.getCurrentUserProfileOrThrow()
 
         if (!mounted) return
 
@@ -54,7 +54,7 @@ export function useEditUserProfile() {
     setErrorText(null)
 
     try {
-      await updateCurrentUserProfile({
+      await userService.updateCurrentUserProfile({
         username: data.username,
         bio: data.bio,
       })
