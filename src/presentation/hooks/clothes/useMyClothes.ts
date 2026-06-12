@@ -1,25 +1,22 @@
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
-import { deleteMyClothe, getMyClothes } from '@/src/application/services/clothesService'
-import {
-  getMyClothesCache,
-  hydrateMyClothesCache,
-  persistMyClothesCache,
-  setMyClothesCache,
-} from '@/src/application/services/clothesLists.cache'
+import { clothingCrudService } from '@/src/composition/clothing'
+import { clothingListCache } from '@/src/composition/clothingListCache'
 
 export function useMyClothes() {
-  const [clothes, setClothes] = useState<ClothesModel[]>(() => getMyClothesCache() ?? [])
+  const [clothes, setClothes] = useState<ClothesModel[]>(
+    () => clothingListCache.getMemory('my') ?? [],
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const loadClothes = useCallback(async () => {
     try {
-      const data = await getMyClothes()
+      const data = await clothingCrudService.getMyClothes()
       setClothes(data)
-      await persistMyClothesCache(data)
+      await clothingListCache.persist('my', data)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Impossible de charger les vetements.'
       Alert.alert('Erreur', message)
@@ -27,7 +24,7 @@ export function useMyClothes() {
   }, [])
 
   const initializeClothes = useCallback(async () => {
-    const hydrated = await hydrateMyClothesCache()
+    const hydrated = await clothingListCache.hydrate('my')
     if (hydrated && hydrated.length > 0) {
       setClothes(hydrated)
     }
@@ -38,11 +35,11 @@ export function useMyClothes() {
   const deleteClothes = useCallback(async (id: string) => {
     try {
       setDeletingId(id)
-      await deleteMyClothe(id)
+      await clothingCrudService.deleteMyClothe(id)
       setClothes((prev) => {
         const next = prev.filter((item) => item.id !== id)
-        setMyClothesCache(next)
-        void persistMyClothesCache(next)
+        clothingListCache.setMemory('my', next)
+        void clothingListCache.persist('my', next)
         return next
       })
     } catch (error) {

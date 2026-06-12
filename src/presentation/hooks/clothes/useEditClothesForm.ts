@@ -8,7 +8,7 @@ import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/infrastructure/
 import { toErrorMessage } from '@/src/shared/utils/errors'
 import { CLOTHES_CATEGORIES } from '@/src/shared/constants/clothesCategories'
 import { createClotheSchema, type CreateClotheInput } from '@/src/domain/rules/clothesSchema'
-import { getMyClotheById, updateMyClothe } from '@/src/application/services/clothesService'
+import { clothingCrudService } from '@/src/composition/clothing'
 
 function isClothesCategory(value: unknown): value is CreateClotheInput['category'] {
   return (
@@ -57,7 +57,7 @@ export function useEditClotheForm() {
       }
 
       try {
-        const clothe = await getMyClotheById(id)
+        const clothe = await clothingCrudService.getMyClotheById(id)
         if (!mounted) return
 
         reset({
@@ -119,7 +119,7 @@ export function useEditClotheForm() {
     setErrorText(null)
 
     try {
-      await updateMyClothe(id, {
+      await clothingCrudService.updateMyClothe(id, {
         name: data.name,
         imageUrl: data.imageUrl,
         imageBase64,

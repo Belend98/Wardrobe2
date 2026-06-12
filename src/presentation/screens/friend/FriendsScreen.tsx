@@ -2,15 +2,11 @@ import { toErrorMessage } from '@/src/shared/utils/errors'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import {
-  getMyFriends,
-  getReceivedFriendRequests,
-  removeFriend,
-  respondToFriendRequest,
-  sendFriendRequest,
   type FriendItem,
   type ReceivedFriendRequest,
-} from '@/src/application/services/friendrequestService'
-import { searchUserByUsername, type SearchedUser } from '@/src/application/services/searchService'
+  type SearchedUser,
+} from '@/src/shared/types/friend.types'
+import { friendService } from '@/src/composition/friend'
 
 export default function FriendsScreen() {
   const [query, setQuery] = useState('')
@@ -30,7 +26,7 @@ export default function FriendsScreen() {
   const loadReceivedRequests = useCallback(async () => {
     try {
       setIsLoadingRequests(true)
-      const data = await getReceivedFriendRequests()
+      const data = await friendService.getReceivedFriendRequests()
       setReceivedRequests(data)
     } catch (error) {
       setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
@@ -46,7 +42,7 @@ export default function FriendsScreen() {
   const loadMyFriends = useCallback(async () => {
     try {
       setIsLoadingFriends(true)
-      const data = await getMyFriends()
+      const data = await friendService.getMyFriends()
       setFriends(data)
     } catch (error) {
       setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
@@ -80,7 +76,7 @@ export default function FriendsScreen() {
 
     try {
       setIsSearching(true)
-      const foundUser = await searchUserByUsername(query)
+      const foundUser = await friendService.searchUserByUsername(query)
       setResult(foundUser)
       setSearchDone(true)
     } catch (error) {
@@ -95,7 +91,7 @@ export default function FriendsScreen() {
 
     try {
       setIsSendingRequest(true)
-      await sendFriendRequest(result.id)
+      await friendService.sendFriendRequest(result.id)
       Alert.alert('Succes', `Demande envoyee a @${result.username}.`)
     } catch (error) {
       setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))
@@ -107,7 +103,7 @@ export default function FriendsScreen() {
   const handleRespond = async (requestId: string, decision: 'accepted' | 'rejected') => {
     try {
       setPendingActionId(requestId)
-      await respondToFriendRequest(requestId, decision)
+      await friendService.respondToFriendRequest(requestId, decision)
       setReceivedRequests((prev) => prev.filter((request) => request.id !== requestId))
       if (decision === 'accepted') {
         await loadMyFriends()
@@ -129,7 +125,7 @@ export default function FriendsScreen() {
         onPress: async () => {
           try {
             setRemovingFriendId(friend.id)
-            await removeFriend(friend.id)
+            await friendService.removeFriend(friend.id)
             setFriends((prev) => prev.filter((item) => item.id !== friend.id))
             Alert.alert('Succes', 'Ami supprime.')
           } catch (error) {

@@ -1,4 +1,4 @@
-import type { ClotheCommentModel } from '@/src/application/services/clothesService'
+import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
 import { useState } from 'react'
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 

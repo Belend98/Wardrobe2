@@ -2,12 +2,9 @@ import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
 import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
 import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
 import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
-import { getMyAndFriendsClothes, getUsernamesByUserIds } from '@/src/application/services/clothesService'
+import { clothingCrudService } from '@/src/composition/clothing'
+import { clothingListCache } from '@/src/composition/clothingListCache'
 import { useClotheEngagement } from '@/src/presentation/hooks/clothes/useClotheEngagement'
-import {
-  hydrateDiscoverClothesCache,
-  persistDiscoverClothesCache,
-} from '@/src/application/services/clothesLists.cache'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
@@ -22,11 +19,13 @@ export default function DiscoverScreen() {
 
   const loadClothes = useCallback(async () => {
     try {
-      const data = await getMyAndFriendsClothes()
+      const data = await clothingCrudService.getMyAndFriendsClothes()
       setClothes(data)
-      const ownerNames = await getUsernamesByUserIds(data.map((item) => item.userId))
+      const ownerNames = await clothingCrudService.getUsernamesByUserIds(
+        data.map((item) => item.userId),
+      )
       setOwnerNamesByUserId(ownerNames)
-      await persistDiscoverClothesCache(data)
+      await clothingListCache.persist('discover', data)
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Impossible de charger les vêtements.'
@@ -37,7 +36,7 @@ export default function DiscoverScreen() {
   useEffect(() => {
     let active = true
     ;(async () => {
-      const hydrated = await hydrateDiscoverClothesCache()
+      const hydrated = await clothingListCache.hydrate('discover')
       if (active && hydrated && hydrated.length > 0) {
         setClothes(hydrated)
       }

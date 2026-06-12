@@ -11,3 +11,5 @@ export type FriendItem = {
   username: string
   bio: string | null
 }
+
+export type SearchedUser = FriendItem

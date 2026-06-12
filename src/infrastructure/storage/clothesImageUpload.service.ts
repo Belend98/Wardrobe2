@@ -7,8 +7,9 @@ export async function uploadClotheImageIfNeeded(
   imageUrl: string,
   isPublic: boolean,
   imageBase64?: string | null,
+  forceUpload = false,
 ) {
-  if (!isLocalUri(imageUrl)) return imageUrl
+  if (!isLocalUri(imageUrl) && !forceUpload) return imageUrl
 
   const binary = imageBase64 ? toUint8Array(imageBase64) : await toUint8ArrayFromLocalUri(imageUrl)
   const extension = extensionFromMimeType('image/jpeg')

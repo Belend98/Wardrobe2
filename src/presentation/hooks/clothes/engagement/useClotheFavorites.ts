@@ -1,4 +1,4 @@
-import { addFavoriteClothe, removeFavoriteClothe } from '@/src/application/services/clothesService'
+import { clothingEngagementService } from '@/src/composition/clothingEngagement'
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 
 type UseClotheFavoritesOptions = {
@@ -34,8 +34,11 @@ export function useClotheFavorites({
       })
 
       try {
-        if (shouldFavorite) await addFavoriteClothe(id, currentUserId ?? undefined)
-        else await removeFavoriteClothe(id, currentUserId ?? undefined)
+        if (shouldFavorite) {
+          await clothingEngagementService.addFavoriteClothe(id, currentUserId ?? undefined)
+        } else {
+          await clothingEngagementService.removeFavoriteClothe(id, currentUserId ?? undefined)
+        }
       } catch (error) {
         setFavoriteClotheIds((prev) => {
           const next = new Set(prev)

@@ -1,4 +1,5 @@
-import { addCommentToClothe, type ClotheCommentModel } from '@/src/application/services/clothesService'
+import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
+import { clothingEngagementService } from '@/src/composition/clothingEngagement'
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 
 type UseClotheCommentsOptions = {
@@ -32,7 +33,11 @@ export function useClotheComments({
 
       setCommentLoadingByClotheId((prev) => ({ ...prev, [id]: true }))
       try {
-        const inserted = await addCommentToClothe(id, trimmed, currentUserId ?? undefined)
+        const inserted = await clothingEngagementService.addCommentToClothe(
+          id,
+          trimmed,
+          currentUserId ?? undefined,
+        )
         setCommentsByClotheId((prev) => ({
           ...prev,
           [id]: [inserted, ...(prev[id] ?? [])],

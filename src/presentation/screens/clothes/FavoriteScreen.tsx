@@ -2,12 +2,9 @@ import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
 import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
 import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
 import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
-import { getMyFavoriteClothes } from '@/src/application/services/clothesService'
+import { clothingEngagementService } from '@/src/composition/clothingEngagement'
+import { clothingListCache } from '@/src/composition/clothingListCache'
 import { useClotheEngagement } from '@/src/presentation/hooks/clothes/useClotheEngagement'
-import {
-  hydrateFavoriteClothesCache,
-  persistFavoriteClothesCache,
-} from '@/src/application/services/clothesLists.cache'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
@@ -21,9 +18,9 @@ export default function FavoriteScreen() {
 
   const loadFavorites = useCallback(async () => {
     try {
-      const data = await getMyFavoriteClothes()
+      const data = await clothingEngagementService.getMyFavoriteClothes()
       setClothes(data)
-      await persistFavoriteClothesCache(data)
+      await clothingListCache.persist('favorite', data)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Impossible de charger les favoris.'
       Alert.alert('Erreur', message)
@@ -33,7 +30,7 @@ export default function FavoriteScreen() {
   useEffect(() => {
     let active = true
     ;(async () => {
-      const hydrated = await hydrateFavoriteClothesCache()
+      const hydrated = await clothingListCache.hydrate('favorite')
       if (active && hydrated && hydrated.length > 0) {
         setClothes(hydrated)
       }

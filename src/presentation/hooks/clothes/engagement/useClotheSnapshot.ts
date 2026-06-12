@@ -1,5 +1,5 @@
-import type { ClotheCommentModel } from '@/src/application/services/clothesService'
-import { getEngagementSnapshotForClothes } from '@/src/application/services/clothesService'
+import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
+import { clothingEngagementService } from '@/src/composition/clothingEngagement'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 type UseClotheSnapshotOptions = {
@@ -22,7 +22,7 @@ export function useClotheSnapshot(clotheIds: string[], options: UseClotheSnapsho
 
   const loadEngagement = useCallback(async () => {
     try {
-      const snapshot = await getEngagementSnapshotForClothes(clotheIds)
+      const snapshot = await clothingEngagementService.getEngagementSnapshotForClothes(clotheIds)
       setLikesCountByClotheId(snapshot.likesCountByClotheId)
       setLikedClotheIds(snapshot.likedClotheIds)
       setFavoriteClotheIds(snapshot.favoriteClotheIds)

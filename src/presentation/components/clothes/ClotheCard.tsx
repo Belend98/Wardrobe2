@@ -1,5 +1,5 @@
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import type { ClotheCommentModel } from '@/src/application/services/clothesService'
+import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
 import ClotheEngagementBar from '@/src/presentation/components/clothes/ClotheEngagementBar'
 import { useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'

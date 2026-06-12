@@ -1,144 +1,169 @@
-import { getMyFriends } from '@/src/application/services/friendrequestService'
-import { authService } from '@/src/composition/auth'
-import { mapRowToModel } from '@/src/infrastructure/supabase/clothes.mapper'
-import {
-  deleteClotheByIdAndUserId,
-  findClotheByIdAndUserId,
-  findClothesByUserId,
-  findClothesByUserIds,
-  findUsernamesByUserIds,
-  findPublicClothes,
-  insertClothe,
-  updateClotheByIdAndUserId,
-} from '@/src/infrastructure/supabase/clothingSupabaseRepository'
-import { deleteClotheImageIfStored, resolveClotheImageUrl, uploadClotheImageIfNeeded } from '@/src/infrastructure/storage/clothes.storage'
-import type { CreateClothesInput, UpdateClothesInput } from '@/src/shared/types/clothes.types'
+import type { AuthService } from '@/src/application/services/authService'
+import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
+import type { ClothingImageStorage } from '@/src/domain/repositories/ClothingImageStorage'
+import type {
+  ClothingRepository,
+  UpdateClothingRecord,
+} from '@/src/domain/repositories/ClothingRepository'
+import type {
+  CreateClothesInput,
+  UpdateClothesInput,
+} from '@/src/shared/types/clothes.types'
 
-export async function createMyClothe(input: CreateClothesInput) {
-  const userId = await authService.getCurrentUserIdOrThrow()
-  const isPublic = input.isPublic ?? true
-  const publicImageUrl = await uploadClotheImageIfNeeded(
-    userId,
-    input.imageUrl,
-    isPublic,
-    input.imageBase64,
-  )
+type GetFriendIds = () => Promise<string[]>
 
-  const data = await insertClothe({
-    user_id: userId,
-    name: input.name,
-    category: input.category ?? null,
-    color: input.color ?? null,
-    image_url: publicImageUrl,
-    description: input.description ?? null,
-    is_public: isPublic,
-  })
+export class ClothingCrudService {
+  constructor(
+    private readonly clothingRepository: ClothingRepository,
+    private readonly imageStorage: ClothingImageStorage,
+    private readonly authService: AuthService,
+    private readonly getFriendIds: GetFriendIds,
+  ) {}
 
-  return mapRowToModel(data)
-}
-
-export async function getMyClothes() {
-  const userId = await authService.getCurrentUserIdOrThrow()
-  const rows = await findClothesByUserId(userId)
-  const mapped = rows.map(mapRowToModel)
-  return Promise.all(
-    mapped.map(async (item) => ({
-      ...item,
-      imageUrl: await resolveClotheImageUrl(item.imageUrl),
-    })),
-  )
-}
-
-export async function getMyClotheById(id: string) {
-  const userId = await authService.getCurrentUserIdOrThrow()
-  const row = await findClotheByIdAndUserId(id, userId)
-  if (!row) throw new Error('Vetement introuvable ou non autorisé.')
-
-  const mapped = mapRowToModel(row)
-  return {
-    ...mapped,
-    imageUrl: await resolveClotheImageUrl(mapped.imageUrl),
-  }
-}
-
-export async function updateMyClothe(id: string, input: UpdateClothesInput) {
-  const userId = await authService.getCurrentUserIdOrThrow()
-  const existing = await findClotheByIdAndUserId(id, userId)
-  if (!existing) throw new Error('Vêtement introuvable ou non autorisé.')
-
-  const payload: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (input.name !== undefined) payload.name = input.name
-  if (input.color !== undefined) payload.color = input.color
-  if (input.category !== undefined) payload.category = input.category
-  const effectiveIsPublic = input.isPublic ?? existing.is_public
-  if (input.imageUrl !== undefined) {
-    payload.image_url = await uploadClotheImageIfNeeded(
+  async createMyClothe(input: CreateClothesInput) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    const isPublic = input.isPublic ?? true
+    const storedImage = await this.imageStorage.storeIfNeeded(
       userId,
       input.imageUrl,
-      effectiveIsPublic,
+      isPublic,
       input.imageBase64,
     )
+
+    try {
+      return await this.clothingRepository.create({
+        userId,
+        name: input.name,
+        category: input.category ?? null,
+        color: input.color ?? null,
+        imageUrl: storedImage.url,
+        description: input.description ?? null,
+        isPublic,
+      })
+    } catch (error) {
+      if (storedImage.wasCreated) {
+        try {
+          await this.imageStorage.delete(storedImage.url)
+        } catch {}
+      }
+      throw error
+    }
   }
-  if (input.description !== undefined) payload.description = input.description
-  if (input.isPublic !== undefined) payload.is_public = input.isPublic
 
-  const data = await updateClotheByIdAndUserId(id, userId, payload)
-  if (!data) throw new Error('Vetement introuvable ou non autorise.')
-
-  if (input.imageUrl !== undefined && existing.image_url !== data.image_url) {
-    await deleteClotheImageIfStored(existing.image_url)
+  async getMyClothes() {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    const clothes = await this.clothingRepository.findByUserId(userId)
+    return this.resolveImageUrls(clothes)
   }
 
-  const mapped = mapRowToModel(data)
-  return {
-    ...mapped,
-    imageUrl: await resolveClotheImageUrl(mapped.imageUrl),
+  async getMyClotheById(id: string) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    const clothe = await this.clothingRepository.findByIdAndUserId(id, userId)
+
+    if (!clothe) throw new Error('Vetement introuvable ou non autorise.')
+
+    return this.resolveImageUrl(clothe)
   }
-}
 
-export async function deleteMyClothe(id: string) {
-  const userId = await authService.getCurrentUserIdOrThrow()
-  const clothe = await findClotheByIdAndUserId(id, userId)
-  if (!clothe) throw new Error('Vetement introuvable ou non autorise.')
+  async updateMyClothe(id: string, input: UpdateClothesInput) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    const existing = await this.clothingRepository.findByIdAndUserId(id, userId)
 
-  await deleteClotheImageIfStored(clothe.image_url)
-  await deleteClotheByIdAndUserId(id, userId)
-}
+    if (!existing) throw new Error('Vetement introuvable ou non autorise.')
 
-export async function getPublicClothes() {
-  const rows = await findPublicClothes()
-  const mapped = rows.map(mapRowToModel)
-  return Promise.all(
-    mapped.map(async (item) => ({
-      ...item,
-      imageUrl: await resolveClotheImageUrl(item.imageUrl),
-    })),
-  )
-}
+    const update: UpdateClothingRecord = {
+      ...(input.name !== undefined ? { name: input.name } : {}),
+      ...(input.color !== undefined ? { color: input.color } : {}),
+      ...(input.category !== undefined ? { category: input.category } : {}),
+      ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.isPublic !== undefined ? { isPublic: input.isPublic } : {}),
+    }
 
-export async function getMyAndFriendsClothes() {
-  const userId = await authService.getCurrentUserIdOrThrow()
-  const friends = await getMyFriends()
-  const userIds = Array.from(new Set([userId, ...friends.map((friend) => friend.id)]))
-  const rows = await findClothesByUserIds(userIds)
-  const mapped = rows
-    .filter((row) => row.is_public === true)
-    .map(mapRowToModel)
+    const effectiveIsPublic = input.isPublic ?? existing.isPublic
+    const visibilityChanged =
+      input.isPublic !== undefined && input.isPublic !== existing.isPublic
+    const storedImage = input.imageUrl
+      ? await this.imageStorage.storeIfNeeded(
+          userId,
+          input.imageUrl,
+          effectiveIsPublic,
+          input.imageBase64,
+          visibilityChanged,
+        )
+      : null
 
-  return Promise.all(
-    mapped.map(async (item) => ({
-      ...item,
-      imageUrl: await resolveClotheImageUrl(item.imageUrl),
-    })),
-  )
-}
+    if (storedImage?.wasCreated) {
+      update.imageUrl = storedImage.url
+    }
 
-export async function getUsernamesByUserIds(userIds: string[]) {
-  const uniqueIds = Array.from(new Set(userIds))
-  const users = await findUsernamesByUserIds(uniqueIds)
-  const usernamesByUserId: Record<string, string> = {}
-  for (const user of users) {
-    usernamesByUserId[user.id as string] = (user.username as string | null) ?? 'Utilisateur'
+    let updated: ClothesModel | null
+    try {
+      updated = await this.clothingRepository.update(id, userId, update)
+    } catch (error) {
+      if (storedImage?.wasCreated) {
+        try {
+          await this.imageStorage.delete(storedImage.url)
+        } catch {}
+      }
+      throw error
+    }
+
+    if (!updated) {
+      if (storedImage?.wasCreated) {
+        await this.imageStorage.delete(storedImage.url)
+      }
+      throw new Error('Vetement introuvable ou non autorise.')
+    }
+
+    if (storedImage?.wasCreated && existing.imageUrl !== updated.imageUrl) {
+      await this.imageStorage.delete(existing.imageUrl)
+    }
+
+    return this.resolveImageUrl(updated)
   }
-  return usernamesByUserId
+
+  async deleteMyClothe(id: string) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    const clothe = await this.clothingRepository.findByIdAndUserId(id, userId)
+
+    if (!clothe) throw new Error('Vetement introuvable ou non autorise.')
+
+    await this.clothingRepository.delete(id, userId)
+    await this.imageStorage.delete(clothe.imageUrl)
+  }
+
+  async getPublicClothes() {
+    const clothes = await this.clothingRepository.findPublic()
+    return this.resolveImageUrls(clothes)
+  }
+
+  async getClothesByIds(ids: string[]) {
+    const clothes = await this.clothingRepository.findByIds(Array.from(new Set(ids)))
+    return this.resolveImageUrls(clothes)
+  }
+
+  async getMyAndFriendsClothes() {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    const friendIds = await this.getFriendIds()
+    const userIds = Array.from(new Set([userId, ...friendIds]))
+    const clothes = await this.clothingRepository.findByUserIds(userIds)
+    const publicClothes = clothes.filter((clothe) => clothe.isPublic)
+
+    return this.resolveImageUrls(publicClothes)
+  }
+
+  getUsernamesByUserIds(userIds: string[]) {
+    return this.clothingRepository.findUsernamesByUserIds(Array.from(new Set(userIds)))
+  }
+
+  private async resolveImageUrl(clothe: ClothesModel): Promise<ClothesModel> {
+    return {
+      ...clothe,
+      imageUrl: await this.imageStorage.resolveUrl(clothe.imageUrl),
+    }
+  }
+
+  private resolveImageUrls(clothes: ClothesModel[]) {
+    return Promise.all(clothes.map((clothe) => this.resolveImageUrl(clothe)))
+  }
 }

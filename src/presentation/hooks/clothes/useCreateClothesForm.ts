@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
 import { createClotheSchema, type CreateClotheInput } from '@/src/domain/rules/clothesSchema'
-import { createMyClothe } from '@/src/application/services/clothesService'
+import { clothingCrudService } from '@/src/composition/clothing'
 
 export function useCreateClotheForm() {
   const [errorText, setErrorText] = useState<string | null>(null)
@@ -63,7 +63,7 @@ export function useCreateClotheForm() {
       setErrorText(null)
 
       try {
-        await createMyClothe({
+        await clothingCrudService.createMyClothe({
           name: data.name,
           imageUrl: data.imageUrl,
           imageBase64,

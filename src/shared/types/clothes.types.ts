@@ -10,10 +10,4 @@ export type CreateClothesInput = {
 
 export type UpdateClothesInput = Partial<CreateClothesInput>
 
-export type ClotheCommentModel = {
-  id: string
-  clotheId: string
-  userId: string
-  content: string
-  createdAt: string
-}
+export type { ClothingComment as ClotheCommentModel } from '@/src/domain/repositories/ClothingEngagementRepository'

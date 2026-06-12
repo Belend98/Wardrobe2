@@ -1,4 +1,4 @@
-import { likeClothe, unlikeClothe } from '@/src/application/services/clothesService'
+import { clothingEngagementService } from '@/src/composition/clothingEngagement'
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 
 type UseClotheLikesOptions = {
@@ -40,8 +40,8 @@ export function useClotheLikes({
       }))
 
       try {
-        if (shouldLike) await likeClothe(id, currentUserId ?? undefined)
-        else await unlikeClothe(id, currentUserId ?? undefined)
+        if (shouldLike) await clothingEngagementService.likeClothe(id, currentUserId ?? undefined)
+        else await clothingEngagementService.unlikeClothe(id, currentUserId ?? undefined)
       } catch (error) {
         setLikedClotheIds((prev) => {
           const next = new Set(prev)
