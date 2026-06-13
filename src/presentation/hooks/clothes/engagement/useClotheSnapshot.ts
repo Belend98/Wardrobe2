@@ -1,4 +1,3 @@
-import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
 import { clothingEngagementService } from '@/src/composition/clothingEngagement'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -12,9 +11,7 @@ export function useClotheSnapshot(clotheIds: string[], options: UseClotheSnapsho
   const [likesCountByClotheId, setLikesCountByClotheId] = useState<Record<string, number>>({})
   const [likedClotheIds, setLikedClotheIds] = useState<Set<string>>(new Set())
   const [favoriteClotheIds, setFavoriteClotheIds] = useState<Set<string>>(new Set())
-  const [commentsByClotheId, setCommentsByClotheId] = useState<Record<string, ClotheCommentModel[]>>({})
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
-  const [userNamesByUserId, setUserNamesByUserId] = useState<Record<string, string>>({})
 
   useEffect(() => {
     onErrorRef.current = onError
@@ -26,9 +23,7 @@ export function useClotheSnapshot(clotheIds: string[], options: UseClotheSnapsho
       setLikesCountByClotheId(snapshot.likesCountByClotheId)
       setLikedClotheIds(snapshot.likedClotheIds)
       setFavoriteClotheIds(snapshot.favoriteClotheIds)
-      setCommentsByClotheId(snapshot.commentsByClotheId)
       setCurrentUserId(snapshot.currentUserId)
-      setUserNamesByUserId(snapshot.userNamesByUserId)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Impossible de charger les interactions.'
       onErrorRef.current?.(message)
@@ -53,10 +48,7 @@ export function useClotheSnapshot(clotheIds: string[], options: UseClotheSnapsho
     setLikedClotheIds,
     favoriteClotheIds,
     setFavoriteClotheIds,
-    commentsByClotheId,
-    setCommentsByClotheId,
     currentUserId,
-    userNamesByUserId,
     loadEngagement,
   }
 }

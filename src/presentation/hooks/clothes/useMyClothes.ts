@@ -1,22 +1,21 @@
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import { useCallback, useState } from 'react'
+import { CLOTHES_STALE_TIME_MS } from '@/src/shared/constants/clothesRefresh'
+import { useCallback, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 import { clothingCrudService } from '@/src/composition/clothing'
-import { clothingListCache } from '@/src/composition/clothingListCache'
 
 export function useMyClothes() {
-  const [clothes, setClothes] = useState<ClothesModel[]>(
-    () => clothingListCache.getMemory('my') ?? [],
-  )
+  const [clothes, setClothes] = useState<ClothesModel[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const lastLoadedAt = useRef(0)
 
   const loadClothes = useCallback(async () => {
     try {
       const data = await clothingCrudService.getMyClothes()
       setClothes(data)
-      await clothingListCache.persist('my', data)
+      lastLoadedAt.current = Date.now()
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Impossible de charger les vetements.'
       Alert.alert('Erreur', message)
@@ -24,11 +23,8 @@ export function useMyClothes() {
   }, [])
 
   const initializeClothes = useCallback(async () => {
-    const hydrated = await clothingListCache.hydrate('my')
-    if (hydrated && hydrated.length > 0) {
-      setClothes(hydrated)
-    }
-    await loadClothes()
+    const isStale = Date.now() - lastLoadedAt.current >= CLOTHES_STALE_TIME_MS
+    if (isStale) await loadClothes()
     setIsLoading(false)
   }, [loadClothes])
 
@@ -36,12 +32,7 @@ export function useMyClothes() {
     try {
       setDeletingId(id)
       await clothingCrudService.deleteMyClothe(id)
-      setClothes((prev) => {
-        const next = prev.filter((item) => item.id !== id)
-        clothingListCache.setMemory('my', next)
-        void clothingListCache.persist('my', next)
-        return next
-      })
+      setClothes((prev) => prev.filter((item) => item.id !== id))
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Impossible de supprimer ce vetement.'

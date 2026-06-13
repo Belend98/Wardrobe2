@@ -1,12 +1,10 @@
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
 import ClotheEngagementBar from '@/src/presentation/components/clothes/ClotheEngagementBar'
 import { useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
 type ClotheCardProps = {
   item: ClothesModel
-  ownerName?: string
   onDelete?: (id: string) => void
   onEdit?: (id: string) => void
   onToggleLike?: (id: string, shouldLike: boolean) => void
@@ -16,18 +14,11 @@ type ClotheCardProps = {
   likesCount?: number
   isLikeLoading?: boolean
   isFavoriteLoading?: boolean
-  commentsCount?: number
-  comments?: ClotheCommentModel[]
-  isCommentLoading?: boolean
-  currentUserId?: string | null
-  userNamesByUserId?: Record<string, string>
-  onAddComment?: (id: string, content: string) => void
   isDeleting?: boolean
 }
 
 export default function ClotheCard({
   item,
-  ownerName = 'Utilisateur',
   onDelete,
   onEdit,
   onToggleLike,
@@ -37,12 +28,6 @@ export default function ClotheCard({
   likesCount = 0,
   isLikeLoading = false,
   isFavoriteLoading = false,
-  commentsCount = 0,
-  comments = [],
-  isCommentLoading = false,
-  currentUserId = null,
-  userNamesByUserId = {},
-  onAddComment,
   isDeleting = false,
 }: ClotheCardProps) {
   const [imageError, setImageError] = useState(false)
@@ -77,7 +62,6 @@ export default function ClotheCard({
             ) : null}
           </View>
         </View>
-        <Text style={styles.ownerText}>Publie par @{ownerName}</Text>
         <View style={styles.metaRow}>
           {item.color ? (
             <View style={styles.metaBadge}>
@@ -100,14 +84,8 @@ export default function ClotheCard({
           isFavoriteByMe={isFavoriteByMe}
           isLikeLoading={isLikeLoading}
           isFavoriteLoading={isFavoriteLoading}
-          commentsCount={commentsCount}
-          comments={comments}
-          isCommentLoading={isCommentLoading}
-          currentUserId={currentUserId}
-          userNamesByUserId={userNamesByUserId}
           onToggleLike={onToggleLike}
           onToggleFavorite={onToggleFavorite}
-          onAddComment={onAddComment}
         />
       </View>
     </View>
@@ -166,11 +144,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-  },
-  ownerText: {
-    color: '#6B7280',
-    fontSize: 12,
-    fontWeight: '600',
   },
   metaBadge: {
     borderRadius: 999,

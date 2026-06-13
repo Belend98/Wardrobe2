@@ -9,5 +9,3 @@ export type CreateClothesInput = {
 }
 
 export type UpdateClothesInput = Partial<CreateClothesInput>
-
-export type { ClothingComment as ClotheCommentModel } from '@/src/domain/repositories/ClothingEngagementRepository'

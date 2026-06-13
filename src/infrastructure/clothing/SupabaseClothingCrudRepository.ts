@@ -140,18 +140,4 @@ export class SupabaseClothingCrudRepository implements ClothingRepository {
     if (error) throw error
   }
 
-  async findUsernamesByUserIds(userIds: string[]): Promise<Record<string, string>> {
-    if (userIds.length === 0) return {}
-
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, username')
-      .in('id', userIds)
-
-    if (error) throw error
-
-    return Object.fromEntries(
-      (data ?? []).map((user) => [user.id, user.username ?? 'Utilisateur']),
-    )
-  }
 }

@@ -2,17 +2,18 @@ import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
 import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
 import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
 import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
+import { CLOTHES_STALE_TIME_MS } from '@/src/shared/constants/clothesRefresh'
 import { clothingCrudService } from '@/src/composition/clothing'
-import { clothingListCache } from '@/src/composition/clothingListCache'
 import { useClotheEngagement } from '@/src/presentation/hooks/clothes/useClotheEngagement'
-import { useCallback, useEffect, useState } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import { useCallback, useRef, useState } from 'react'
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
 export default function DiscoverScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [clothes, setClothes] = useState<ClothesModel[]>([])
-  const [ownerNamesByUserId, setOwnerNamesByUserId] = useState<Record<string, string>>({})
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
+  const lastLoadedAt = useRef(0)
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
     onError: (message) => Alert.alert('Erreur', message),
   })
@@ -21,11 +22,7 @@ export default function DiscoverScreen() {
     try {
       const data = await clothingCrudService.getMyAndFriendsClothes()
       setClothes(data)
-      const ownerNames = await clothingCrudService.getUsernamesByUserIds(
-        data.map((item) => item.userId),
-      )
-      setOwnerNamesByUserId(ownerNames)
-      await clothingListCache.persist('discover', data)
+      lastLoadedAt.current = Date.now()
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Impossible de charger les vêtements.'
@@ -33,20 +30,12 @@ export default function DiscoverScreen() {
     }
   }, [])
 
-  useEffect(() => {
-    let active = true
-    ;(async () => {
-      const hydrated = await clothingListCache.hydrate('discover')
-      if (active && hydrated && hydrated.length > 0) {
-        setClothes(hydrated)
-      }
-      await loadClothes()
-    })()
-
-    return () => {
-      active = false
-    }
-  }, [loadClothes])
+  useFocusEffect(
+    useCallback(() => {
+      const isStale = Date.now() - lastLoadedAt.current >= CLOTHES_STALE_TIME_MS
+      if (isStale) void loadClothes()
+    }, [loadClothes]),
+  )
 
   const handleRefresh = async () => {
     setIsRefreshing(true)
@@ -60,7 +49,6 @@ export default function DiscoverScreen() {
   const renderItem = ({ item }: { item: ClothesModel }) => (
     <ClotheCard
       item={item}
-      ownerName={ownerNamesByUserId[item.userId] ?? 'Utilisateur'}
       {...getCardEngagementProps(item.id)}
     />
   )

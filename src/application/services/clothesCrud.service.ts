@@ -152,10 +152,6 @@ export class ClothingCrudService {
     return this.resolveImageUrls(publicClothes)
   }
 
-  getUsernamesByUserIds(userIds: string[]) {
-    return this.clothingRepository.findUsernamesByUserIds(Array.from(new Set(userIds)))
-  }
-
   private async resolveImageUrl(clothe: ClothesModel): Promise<ClothesModel> {
     return {
       ...clothe,

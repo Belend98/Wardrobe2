@@ -1,5 +1,4 @@
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import { useClotheComments } from '@/src/presentation/hooks/clothes/engagement/useClotheComments'
 import { useClotheFavorites } from '@/src/presentation/hooks/clothes/engagement/useClotheFavorites'
 import { useClotheLikes } from '@/src/presentation/hooks/clothes/engagement/useClotheLikes'
 import { useClotheSnapshot } from '@/src/presentation/hooks/clothes/engagement/useClotheSnapshot'
@@ -30,13 +29,6 @@ export function useClotheEngagement(
     favoriteClotheIds: snapshot.favoriteClotheIds,
     setFavoriteClotheIds: snapshot.setFavoriteClotheIds,
   })
-  const comments = useClotheComments({
-    onError,
-    currentUserId: snapshot.currentUserId,
-    commentsByClotheId: snapshot.commentsByClotheId,
-    setCommentsByClotheId: snapshot.setCommentsByClotheId,
-  })
-
   return {
     getCardEngagementProps: (clotheId: string) => ({
       likesCount: snapshot.likesCountByClotheId[clotheId] ?? 0,
@@ -44,14 +36,8 @@ export function useClotheEngagement(
       isLikeLoading: likes.likeLoadingByClotheId[clotheId] ?? false,
       isFavoriteByMe: favorites.favoriteClotheIds.has(clotheId),
       isFavoriteLoading: favorites.favoriteLoadingByClotheId[clotheId] ?? false,
-      comments: comments.commentsByClotheId[clotheId] ?? [],
-      commentsCount: (comments.commentsByClotheId[clotheId] ?? []).length,
-      isCommentLoading: comments.commentLoadingByClotheId[clotheId] ?? false,
-      currentUserId: snapshot.currentUserId,
-      userNamesByUserId: snapshot.userNamesByUserId,
       onToggleLike: likes.toggleLike,
       onToggleFavorite: favorites.toggleFavorite,
-      onAddComment: comments.addComment,
     }),
     reloadEngagement: snapshot.loadEngagement,
   }

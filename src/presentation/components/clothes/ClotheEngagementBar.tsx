@@ -1,6 +1,4 @@
-import type { ClotheCommentModel } from '@/src/shared/types/clothes.types'
-import { useState } from 'react'
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 type ClotheEngagementBarProps = {
   clotheId: string
@@ -9,14 +7,8 @@ type ClotheEngagementBarProps = {
   isFavoriteByMe: boolean
   isLikeLoading: boolean
   isFavoriteLoading: boolean
-  commentsCount: number
-  comments: ClotheCommentModel[]
-  isCommentLoading: boolean
-  currentUserId?: string | null
-  userNamesByUserId?: Record<string, string>
   onToggleLike?: (id: string, shouldLike: boolean) => void
   onToggleFavorite?: (id: string, shouldFavorite: boolean) => void
-  onAddComment?: (id: string, content: string) => void
 }
 
 export default function ClotheEngagementBar({
@@ -26,67 +18,11 @@ export default function ClotheEngagementBar({
   isFavoriteByMe,
   isLikeLoading,
   isFavoriteLoading,
-  commentsCount,
-  comments,
-  isCommentLoading,
-  currentUserId,
-  userNamesByUserId = {},
   onToggleLike,
   onToggleFavorite,
-  onAddComment,
 }: ClotheEngagementBarProps) {
-  const [draftComment, setDraftComment] = useState('')
-  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false)
-  const previewComments = comments.slice(0, 3)
-
-  const handleSendComment = () => {
-    const content = draftComment.trim()
-    if (!content || !onAddComment) return
-    onAddComment(clotheId, content)
-    setDraftComment('')
-  }
-
   return (
     <>
-      <Pressable onPress={() => setIsCommentsModalOpen(true)} style={styles.commentsCountButton}>
-        <Text style={styles.commentsCountText}>
-          {commentsCount} {commentsCount > 1 ? 'commentaires' : 'commentaire'}
-        </Text>
-      </Pressable>
-      <FlatList
-        data={previewComments}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Text style={styles.commentText} numberOfLines={2}>
-            {item.userId === currentUserId
-              ? userNamesByUserId[item.userId] ?? 'Moi'
-              : userNamesByUserId[item.userId] ?? 'Utilisateur'}
-            : {item.content}
-          </Text>
-        )}
-        scrollEnabled={false}
-        style={styles.commentsList}
-        contentContainerStyle={styles.commentsListContent}
-        ListEmptyComponent={<Text style={styles.commentEmpty}>Aucun commentaire.</Text>}
-      />
-      <View style={styles.commentInputRow}>
-        <TextInput
-          value={draftComment}
-          onChangeText={setDraftComment}
-          placeholder="Commenter..."
-          style={styles.commentInput}
-          editable={!isCommentLoading}
-          maxLength={180}
-        />
-        <Pressable
-          onPress={handleSendComment}
-          disabled={isCommentLoading || !draftComment.trim() || !onAddComment}
-          style={[styles.commentButton, (isCommentLoading || !draftComment.trim()) ? styles.disabled : undefined]}
-        >
-          <Text style={styles.commentButtonText}>{isCommentLoading ? '...' : 'OK'}</Text>
-        </Pressable>
-      </View>
-
       <View style={styles.favoriteRow}>
         <Pressable
           onPress={() => onToggleFavorite?.(clotheId, !isFavoriteByMe)}
@@ -121,39 +57,6 @@ export default function ClotheEngagementBar({
           {likesCount} {likesCount > 1 ? 'likes' : 'like'}
         </Text>
       </View>
-
-      <Modal
-        visible={isCommentsModalOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setIsCommentsModalOpen(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Commentaires</Text>
-              <Pressable onPress={() => setIsCommentsModalOpen(false)} style={styles.modalCloseButton}>
-                <Text style={styles.modalCloseText}>Fermer</Text>
-              </Pressable>
-            </View>
-            <FlatList
-              data={comments}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <Text style={styles.modalCommentText}>
-                  {item.userId === currentUserId
-                    ? userNamesByUserId[item.userId] ?? 'Moi'
-                    : userNamesByUserId[item.userId] ?? 'Utilisateur'}
-                  : {item.content}
-                </Text>
-              )}
-              contentContainerStyle={styles.modalListContent}
-              ListEmptyComponent={<Text style={styles.commentEmpty}>Aucun commentaire.</Text>}
-              style={styles.modalList}
-            />
-          </View>
-        </View>
-      </Modal>
     </>
   )
 }
@@ -214,106 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
-  commentsCountButton: {
-    alignSelf: 'flex-start',
-  },
-  commentsCountText: {
-    marginTop: 6,
-    color: '#57534E',
-    fontSize: 11,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-  commentText: {
-    marginTop: 1,
-    color: '#44403C',
-    fontSize: 11,
-  },
-  commentsList: {
-    marginTop: 3,
-    minHeight: 42,
-  },
-  commentsListContent: {
-    gap: 2,
-  },
-  commentEmpty: {
-    color: '#A8A29E',
-    fontSize: 11,
-    fontStyle: 'italic',
-  },
-  commentInputRow: {
-    marginTop: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  commentInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#D6D3D1',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    fontSize: 11,
-    backgroundColor: '#FAFAF9',
-  },
-  commentButton: {
-    borderRadius: 8,
-    backgroundColor: '#111827',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  commentButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 11,
-  },
   disabled: {
     opacity: 0.6,
-  },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  modalCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 12,
-    maxHeight: '70%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#1F2937',
-  },
-  modalCloseButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
-  },
-  modalCloseText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#374151',
-  },
-  modalList: {
-    flexGrow: 0,
-  },
-  modalListContent: {
-    gap: 6,
-  },
-  modalCommentText: {
-    color: '#374151',
-    fontSize: 13,
-    lineHeight: 18,
   },
 })

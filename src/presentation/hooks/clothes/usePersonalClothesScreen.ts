@@ -1,8 +1,9 @@
 import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
 import { useClotheEngagement } from '@/src/presentation/hooks/clothes/useClotheEngagement'
 import { useMyClothes } from '@/src/presentation/hooks/clothes/useMyClothes'
+import { useFocusEffect } from '@react-navigation/native'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 
 export function usePersonalClothesScreen() {
@@ -15,9 +16,11 @@ export function usePersonalClothesScreen() {
     onError: (message) => Alert.alert('Erreur', message),
   })
 
-  useEffect(() => {
-    void initializeClothes()
-  }, [initializeClothes])
+  useFocusEffect(
+    useCallback(() => {
+      void initializeClothes()
+    }, [initializeClothes]),
+  )
 
   const handleRefresh = useCallback(async () => {
     await refreshClothes()

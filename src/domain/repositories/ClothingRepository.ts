@@ -22,5 +22,4 @@ export interface ClothingRepository {
     data: UpdateClothingRecord,
   ): Promise<ClothesModel | null>
   delete(id: string, userId: string): Promise<void>
-  findUsernamesByUserIds(userIds: string[]): Promise<Record<string, string>>
 }
