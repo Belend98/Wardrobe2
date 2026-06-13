@@ -1,50 +1,37 @@
-import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
-import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
-import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
-import { CLOTHES_STALE_TIME_MS } from '@/src/shared/constants/clothesRefresh'
 import { clothingEngagementService } from '@/src/composition/clothingEngagement'
+import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
+import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
 import { useClotheEngagement } from '@/src/presentation/hooks/clothes/useClotheEngagement'
+import { usePaginatedClothes } from '@/src/presentation/hooks/clothes/usePaginatedClothes'
+import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback, useRef, useState } from 'react'
-import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
-
+import { useCallback, useState } from 'react'
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
 export default function FavoriteScreen() {
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [clothes, setClothes] = useState<ClothesModel[]>([])
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
-  const lastLoadedAt = useRef(0)
+  const loadPage = useCallback(
+    (pagination: Parameters<typeof clothingEngagementService.getMyFavoriteClothes>[0]) =>
+      clothingEngagementService.getMyFavoriteClothes(pagination),
+    [],
+  )
+  const {
+    clothes,
+    isRefreshing,
+    isLoadingMore,
+    initializeClothes,
+    refreshClothes,
+    loadMoreClothes,
+  } = usePaginatedClothes(loadPage)
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
     onError: (message) => Alert.alert('Erreur', message),
   })
 
-  const loadFavorites = useCallback(async () => {
-    try {
-      const data = await clothingEngagementService.getMyFavoriteClothes()
-      setClothes(data)
-      lastLoadedAt.current = Date.now()
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Impossible de charger les favoris.'
-      Alert.alert('Erreur', message)
-    }
-  }, [])
-
   useFocusEffect(
     useCallback(() => {
-      const isStale = Date.now() - lastLoadedAt.current >= CLOTHES_STALE_TIME_MS
-      if (isStale) void loadFavorites()
-    }, [loadFavorites]),
+      void initializeClothes()
+    }, [initializeClothes]),
   )
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true)
-    try {
-      await loadFavorites()
-    } finally {
-      setIsRefreshing(false)
-    }
-  }
 
   const filteredClothes = clothes.filter(
     (item) => categoryFilter === CLOTHES_CATEGORY_ALL || item.category === categoryFilter,
@@ -54,7 +41,7 @@ export default function FavoriteScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Favoris</Text>
-        <Text style={styles.subtitle}>Tes vetements en favoris.</Text>
+        <Text style={styles.subtitle}>Tes vêtements en favoris.</Text>
         <ClothesFilter categoryFilter={categoryFilter} onSelectCategory={setCategoryFilter} />
       </View>
 
@@ -64,7 +51,10 @@ export default function FavoriteScreen() {
         renderItem={({ item }) => <ClotheCard item={item} {...getCardEngagementProps(item.id)} />}
         contentContainerStyle={styles.listContent}
         refreshing={isRefreshing}
-        onRefresh={handleRefresh}
+        onRefresh={refreshClothes}
+        onEndReached={loadMoreClothes}
+        onEndReachedThreshold={0.4}
+        ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.footerLoader} /> : null}
         ListEmptyComponent={
           <View style={styles.centerState}>
             <Text style={styles.stateText}>Aucun favori pour le moment.</Text>
@@ -106,5 +96,8 @@ const styles = StyleSheet.create({
   },
   stateText: {
     color: '#6B7280',
+  },
+  footerLoader: {
+    marginVertical: 16,
   },
 })

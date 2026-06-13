@@ -9,8 +9,17 @@ import { Alert } from 'react-native'
 export function usePersonalClothesScreen() {
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
 
-  const { clothes, isLoading, isRefreshing, deletingId, initializeClothes, refreshClothes, deleteClothes } =
-    useMyClothes()
+  const {
+    clothes,
+    isLoading,
+    isRefreshing,
+    isLoadingMore,
+    deletingId,
+    initializeClothes,
+    refreshClothes,
+    loadMoreClothes,
+    deleteClothes,
+  } = useMyClothes()
 
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
     onError: (message) => Alert.alert('Erreur', message),
@@ -54,10 +63,12 @@ export function usePersonalClothesScreen() {
     clothes: filteredClothes,
     isLoading,
     isRefreshing,
+    isLoadingMore,
     deletingId,
     categoryFilter,
     setCategoryFilter,
     handleRefresh,
+    loadMoreClothes,
     confirmDelete,
     handleEdit,
     getCardEngagementProps,

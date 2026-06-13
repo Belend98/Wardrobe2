@@ -1,38 +1,23 @@
-import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import { CLOTHES_STALE_TIME_MS } from '@/src/shared/constants/clothesRefresh'
-import { useCallback, useRef, useState } from 'react'
-import { Alert } from 'react-native'
 import { clothingCrudService } from '@/src/composition/clothing'
+import { usePaginatedClothes } from '@/src/presentation/hooks/clothes/usePaginatedClothes'
+import { useCallback, useState } from 'react'
+import { Alert } from 'react-native'
 
 export function useMyClothes() {
-  const [clothes, setClothes] = useState<ClothesModel[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const lastLoadedAt = useRef(0)
-
-  const loadClothes = useCallback(async () => {
-    try {
-      const data = await clothingCrudService.getMyClothes()
-      setClothes(data)
-      lastLoadedAt.current = Date.now()
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Impossible de charger les vetements.'
-      Alert.alert('Erreur', message)
-    }
-  }, [])
-
-  const initializeClothes = useCallback(async () => {
-    const isStale = Date.now() - lastLoadedAt.current >= CLOTHES_STALE_TIME_MS
-    if (isStale) await loadClothes()
-    setIsLoading(false)
-  }, [loadClothes])
+  const loadPage = useCallback(
+    (pagination: Parameters<typeof clothingCrudService.getMyClothes>[0]) =>
+      clothingCrudService.getMyClothes(pagination),
+    [],
+  )
+  const pagination = usePaginatedClothes(loadPage)
+  const { removeClothe } = pagination
 
   const deleteClothes = useCallback(async (id: string) => {
     try {
       setDeletingId(id)
       await clothingCrudService.deleteMyClothe(id)
-      setClothes((prev) => prev.filter((item) => item.id !== id))
+      removeClothe(id)
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Impossible de supprimer ce vetement.'
@@ -40,26 +25,11 @@ export function useMyClothes() {
     } finally {
       setDeletingId(null)
     }
-  }, [])
-
-  const refreshClothes = useCallback(async () => {
-    setIsRefreshing(true)
-    try {
-      await loadClothes()
-    } finally {
-      setIsRefreshing(false)
-    }
-  }, [loadClothes])
+  }, [removeClothe])
 
   return {
-    clothes,
-    isLoading,
-    isRefreshing,
+    ...pagination,
     deletingId,
-    loadClothes,
-    initializeClothes,
-    refreshClothes,
     deleteClothes,
-    setIsLoading,
   }
 }

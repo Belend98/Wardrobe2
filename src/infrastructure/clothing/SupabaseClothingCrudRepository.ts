@@ -4,6 +4,7 @@ import type {
   CreateClothingRecord,
   UpdateClothingRecord,
 } from '@/src/domain/repositories/ClothingRepository'
+import type { PaginatedResult, Pagination } from '@/src/domain/pagination'
 import {
   mapRowToModel,
   type ClothesRow,
@@ -41,6 +42,13 @@ function mapRows(rows: ClothesRow[]): ClothesModel[] {
   return rows.map(mapRowToModel)
 }
 
+function toPaginatedResult(rows: ClothesRow[], limit: number): PaginatedResult<ClothesModel> {
+  return {
+    items: mapRows(rows.slice(0, limit)),
+    hasMore: rows.length > limit,
+  }
+}
+
 export class SupabaseClothingCrudRepository implements ClothingRepository {
   async create(data: CreateClothingRecord): Promise<ClothesModel> {
     const { data: row, error } = await supabase
@@ -53,28 +61,36 @@ export class SupabaseClothingCrudRepository implements ClothingRepository {
     return mapRowToModel(row)
   }
 
-  async findByUserId(userId: string): Promise<ClothesModel[]> {
+  async findByUserId(userId: string, pagination: Pagination): Promise<PaginatedResult<ClothesModel>> {
     const { data, error } = await supabase
       .from('clothes')
       .select(CLOTHES_SELECT)
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(pagination.offset, pagination.offset + pagination.limit)
 
     if (error) throw error
-    return mapRows(data ?? [])
+    return toPaginatedResult(data ?? [], pagination.limit)
   }
 
-  async findByUserIds(userIds: string[]): Promise<ClothesModel[]> {
-    if (userIds.length === 0) return []
+  async findPublicByUserIds(
+    userIds: string[],
+    pagination: Pagination,
+  ): Promise<PaginatedResult<ClothesModel>> {
+    if (userIds.length === 0) return { items: [], hasMore: false }
 
     const { data, error } = await supabase
       .from('clothes')
       .select(CLOTHES_SELECT)
       .in('user_id', userIds)
+      .eq('is_public', true)
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(pagination.offset, pagination.offset + pagination.limit)
 
     if (error) throw error
-    return mapRows(data ?? [])
+    return toPaginatedResult(data ?? [], pagination.limit)
   }
 
   async findByIds(ids: string[]): Promise<ClothesModel[]> {
@@ -102,15 +118,17 @@ export class SupabaseClothingCrudRepository implements ClothingRepository {
     return data ? mapRowToModel(data) : null
   }
 
-  async findPublic(): Promise<ClothesModel[]> {
+  async findPublic(pagination: Pagination): Promise<PaginatedResult<ClothesModel>> {
     const { data, error } = await supabase
       .from('clothes')
       .select(CLOTHES_SELECT)
       .eq('is_public', true)
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(pagination.offset, pagination.offset + pagination.limit)
 
     if (error) throw error
-    return mapRows(data ?? [])
+    return toPaginatedResult(data ?? [], pagination.limit)
   }
 
   async update(

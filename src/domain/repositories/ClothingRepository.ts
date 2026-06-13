@@ -1,4 +1,5 @@
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
+import type { PaginatedResult, Pagination } from '@/src/domain/pagination'
 
 export type CreateClothingRecord = Omit<
   ClothesModel,
@@ -11,11 +12,11 @@ export type UpdateClothingRecord = Partial<
 
 export interface ClothingRepository {
   create(data: CreateClothingRecord): Promise<ClothesModel>
-  findByUserId(userId: string): Promise<ClothesModel[]>
-  findByUserIds(userIds: string[]): Promise<ClothesModel[]>
+  findByUserId(userId: string, pagination: Pagination): Promise<PaginatedResult<ClothesModel>>
+  findPublicByUserIds(userIds: string[], pagination: Pagination): Promise<PaginatedResult<ClothesModel>>
   findByIds(ids: string[]): Promise<ClothesModel[]>
   findByIdAndUserId(id: string, userId: string): Promise<ClothesModel | null>
-  findPublic(): Promise<ClothesModel[]>
+  findPublic(pagination: Pagination): Promise<PaginatedResult<ClothesModel>>
   update(
     id: string,
     userId: string,
