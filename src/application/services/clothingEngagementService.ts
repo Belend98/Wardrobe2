@@ -30,36 +30,27 @@ export class ClothingEngagementService {
       likesCountByClotheId,
       likedClotheIds,
       favoriteClotheIds: new Set(favoriteIds),
-      currentUserId: userId,
     }
   }
 
-  async likeClothe(clotheId: string, userId?: string) {
-    await this.engagementRepository.addLike(
-      clotheId,
-      userId ?? (await this.authService.getCurrentUserIdOrThrow()),
-    )
+  async likeClothe(clotheId: string) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    await this.engagementRepository.addLike(clotheId, userId)
   }
 
-  async unlikeClothe(clotheId: string, userId?: string) {
-    await this.engagementRepository.removeLike(
-      clotheId,
-      userId ?? (await this.authService.getCurrentUserIdOrThrow()),
-    )
+  async unlikeClothe(clotheId: string) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    await this.engagementRepository.removeLike(clotheId, userId)
   }
 
-  async addFavoriteClothe(clotheId: string, userId?: string) {
-    await this.engagementRepository.addFavorite(
-      clotheId,
-      userId ?? (await this.authService.getCurrentUserIdOrThrow()),
-    )
+  async addFavoriteClothe(clotheId: string) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    await this.engagementRepository.addFavorite(clotheId, userId)
   }
 
-  async removeFavoriteClothe(clotheId: string, userId?: string) {
-    await this.engagementRepository.removeFavorite(
-      clotheId,
-      userId ?? (await this.authService.getCurrentUserIdOrThrow()),
-    )
+  async removeFavoriteClothe(clotheId: string) {
+    const userId = await this.authService.getCurrentUserIdOrThrow()
+    await this.engagementRepository.removeFavorite(clotheId, userId)
   }
 
   async getMyFavoriteClothes(pagination: Pagination) {

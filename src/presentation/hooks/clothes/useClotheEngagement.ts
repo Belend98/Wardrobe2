@@ -18,14 +18,12 @@ export function useClotheEngagement(
   const snapshot = useClotheSnapshot(clotheIds, { onError })
   const likes = useClotheLikes({
     onError,
-    currentUserId: snapshot.currentUserId,
     likedClotheIds: snapshot.likedClotheIds,
     setLikedClotheIds: snapshot.setLikedClotheIds,
     setLikesCountByClotheId: snapshot.setLikesCountByClotheId,
   })
   const favorites = useClotheFavorites({
     onError,
-    currentUserId: snapshot.currentUserId,
     favoriteClotheIds: snapshot.favoriteClotheIds,
     setFavoriteClotheIds: snapshot.setFavoriteClotheIds,
   })
@@ -39,6 +37,5 @@ export function useClotheEngagement(
       onToggleLike: likes.toggleLike,
       onToggleFavorite: favorites.toggleFavorite,
     }),
-    reloadEngagement: snapshot.loadEngagement,
   }
 }
