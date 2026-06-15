@@ -69,7 +69,7 @@ export class ClothingCrudService {
     const userId = await this.authService.getCurrentUserIdOrThrow()
     const existing = await this.clothingRepository.findByIdAndUserId(id, userId)
 
-    if (!existing) throw new Error('Vetement introuvable ou non autorise.')
+    if (!existing) throw new Error('Vêtement introuvable ou non autorisé.')
 
     const update: UpdateClothingRecord = {
       ...(input.name !== undefined ? { name: input.name } : {}),
@@ -112,7 +112,7 @@ export class ClothingCrudService {
       if (storedImage?.wasCreated) {
         await this.imageStorage.delete(storedImage.url)
       }
-      throw new Error('Vetement introuvable ou non autorise.')
+      throw new Error('Vêtement introuvable ou non autorisé.')
     }
 
     if (storedImage?.wasCreated && existing.imageUrl !== updated.imageUrl) {
@@ -126,7 +126,7 @@ export class ClothingCrudService {
     const userId = await this.authService.getCurrentUserIdOrThrow()
     const clothe = await this.clothingRepository.findByIdAndUserId(id, userId)
 
-    if (!clothe) throw new Error('Vetement introuvable ou non autorise.')
+    if (!clothe) throw new Error('Vêtement introuvable ou non autorisé.')
 
     await this.clothingRepository.delete(id, userId)
     await this.imageStorage.delete(clothe.imageUrl)
