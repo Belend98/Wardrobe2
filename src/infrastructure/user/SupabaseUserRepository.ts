@@ -67,10 +67,10 @@ export class SupabaseUserRepository implements UserRepository {
 
   async deleteAccountData(userId: string): Promise<void> {
     const imageUrls = await this.getClotheImageUrls(userId)
+    await Promise.all(imageUrls.map((imageUrl) => deleteClotheImageIfStored(imageUrl)))
+
     const { error } = await supabase.rpc('delete_current_user_account_data')
 
     if (error) throw error
-
-    await Promise.all(imageUrls.map((imageUrl) => deleteClotheImageIfStored(imageUrl)))
   }
 }

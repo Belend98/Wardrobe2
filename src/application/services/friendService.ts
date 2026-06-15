@@ -60,6 +60,6 @@ export class FriendService {
       throw new Error("Tu ne peux pas te supprimer toi-meme de tes amis.")
     }
 
-    await this.friendRepository.removeFriendship(userId, friendId)
+    await this.friendRepository.removeFriendship(friendId)
   }
 }

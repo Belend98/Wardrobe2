@@ -183,21 +183,12 @@ export class SupabaseFriendRepository implements FriendRepository {
     }))
   }
 
-  async removeFriendship(firstUserId: string, secondUserId: string): Promise<void> {
-    const { error: outgoingError } = await supabase
-      .from('friendships')
-      .delete()
-      .eq('user_id', firstUserId)
-      .eq('friend_id', secondUserId)
+  async removeFriendship(friendId: string): Promise<void> {
+    const { data: wasDeleted, error } = await supabase.rpc('remove_friendship', {
+      p_friend_id: friendId,
+    })
 
-    if (outgoingError) throw outgoingError
-
-    const { error: incomingError } = await supabase
-      .from('friendships')
-      .delete()
-      .eq('user_id', secondUserId)
-      .eq('friend_id', firstUserId)
-
-    if (incomingError) throw incomingError
+    if (error) throw error
+    if (!wasDeleted) throw new Error("Cette relation d'amitie n'existe plus.")
   }
 }

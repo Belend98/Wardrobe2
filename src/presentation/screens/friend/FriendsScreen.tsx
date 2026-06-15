@@ -126,7 +126,7 @@ export default function FriendsScreen() {
           try {
             setRemovingFriendId(friend.id)
             await friendService.removeFriend(friend.id)
-            setFriends((prev) => prev.filter((item) => item.id !== friend.id))
+            await loadMyFriends()
             Alert.alert('Succes', 'Ami supprime.')
           } catch (error) {
             setErrorText(toErrorMessage(error, 'Erreur pendant la recherche.'))

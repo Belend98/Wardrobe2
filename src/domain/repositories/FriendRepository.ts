@@ -18,5 +18,5 @@ export interface FriendRepository {
     decision: FriendRequestDecision,
   ): Promise<void>
   getFriends(userId: string): Promise<FriendItem[]>
-  removeFriendship(firstUserId: string, secondUserId: string): Promise<void>
+  removeFriendship(friendId: string): Promise<void>
 }

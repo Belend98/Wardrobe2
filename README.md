@@ -50,3 +50,7 @@ npm.cmd run lint
 ```
 
 - Verifier que les variables Supabase sont bien renseignees dans `.env`.
+
+## Migrations Supabase
+
+Executer les fichiers du dossier `supabase/migrations` dans l'editeur SQL Supabase, dans l'ordre de leur nom.

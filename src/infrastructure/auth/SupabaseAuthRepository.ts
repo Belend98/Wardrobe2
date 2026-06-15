@@ -53,6 +53,7 @@ export class SupabaseAuthRepository implements AuthRepository {
       error,
     } = await supabase.auth.getUser()
 
+    if (error?.name === 'AuthSessionMissingError') return null
     if (error) throw error
 
     return mapUser(user)
