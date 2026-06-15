@@ -1,19 +1,17 @@
 import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
 import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
 import { usePersonalClothesScreen } from '@/src/presentation/hooks/clothes/usePersonalClothesScreen'
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 export default function PersonalClothesScreen() {
   const {
     clothes,
     isLoading,
     isRefreshing,
-    isLoadingMore,
     deletingId,
     categoryFilter,
     setCategoryFilter,
     handleRefresh,
-    loadMoreClothes,
     confirmDelete,
     handleEdit,
     getCardEngagementProps,
@@ -50,9 +48,6 @@ export default function PersonalClothesScreen() {
           contentContainerStyle={styles.listContent}
           refreshing={isRefreshing}
           onRefresh={handleRefresh}
-          onEndReached={loadMoreClothes}
-          onEndReachedThreshold={0.4}
-          ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.footerLoader} /> : null}
           ListEmptyComponent={
             <View style={styles.centerState}>
               <Text style={styles.stateText}>Tu n&apos;as pas encore publie de vetement.</Text>
@@ -101,9 +96,6 @@ const styles = StyleSheet.create({
   },
   stateText: {
     color: '#6B7280',
-  },
-  footerLoader: {
-    marginVertical: 16,
   },
   subtitle: {
     marginTop: 8,

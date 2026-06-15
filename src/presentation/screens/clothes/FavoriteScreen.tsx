@@ -2,27 +2,21 @@ import { clothingEngagementService } from '@/src/composition/clothingEngagement'
 import ClotheCard from '@/src/presentation/components/clothes/ClotheCard'
 import ClothesFilter from '@/src/presentation/components/clothes/ClothesFilter'
 import { useClotheEngagement } from '@/src/presentation/hooks/clothes/useClotheEngagement'
-import { usePaginatedClothes } from '@/src/presentation/hooks/clothes/usePaginatedClothes'
+import { useClothes } from '@/src/presentation/hooks/clothes/useClothes'
 import { CLOTHES_CATEGORY_ALL } from '@/src/shared/constants/clothesCategories'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useState } from 'react'
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'react-native'
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native'
 
 export default function FavoriteScreen() {
   const [categoryFilter, setCategoryFilter] = useState<string>(CLOTHES_CATEGORY_ALL)
-  const loadPage = useCallback(
-    (pagination: Parameters<typeof clothingEngagementService.getMyFavoriteClothes>[0]) =>
-      clothingEngagementService.getMyFavoriteClothes(pagination),
-    [],
-  )
+  const loadClothes = useCallback(() => clothingEngagementService.getMyFavoriteClothes(), [])
   const {
     clothes,
     isRefreshing,
-    isLoadingMore,
     initializeClothes,
     refreshClothes,
-    loadMoreClothes,
-  } = usePaginatedClothes(loadPage)
+  } = useClothes(loadClothes)
   const { getCardEngagementProps } = useClotheEngagement(clothes, {
     onError: (message) => Alert.alert('Erreur', message),
   })
@@ -52,9 +46,6 @@ export default function FavoriteScreen() {
         contentContainerStyle={styles.listContent}
         refreshing={isRefreshing}
         onRefresh={refreshClothes}
-        onEndReached={loadMoreClothes}
-        onEndReachedThreshold={0.4}
-        ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.footerLoader} /> : null}
         ListEmptyComponent={
           <View style={styles.centerState}>
             <Text style={styles.stateText}>Aucun favori pour le moment.</Text>
@@ -96,8 +87,5 @@ const styles = StyleSheet.create({
   },
   stateText: {
     color: '#6B7280',
-  },
-  footerLoader: {
-    marginVertical: 16,
   },
 })

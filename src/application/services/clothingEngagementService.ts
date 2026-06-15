@@ -1,6 +1,5 @@
 import type { AuthService } from '@/src/application/services/authService'
 import type { ClothingCrudService } from '@/src/application/services/clothesCrud.service'
-import type { Pagination } from '@/src/domain/pagination'
 import type { ClothingEngagementRepository } from '@/src/domain/repositories/ClothingEngagementRepository'
 
 export class ClothingEngagementService {
@@ -53,12 +52,9 @@ export class ClothingEngagementService {
     await this.engagementRepository.removeFavorite(clotheId, userId)
   }
 
-  async getMyFavoriteClothes(pagination: Pagination) {
+  async getMyFavoriteClothes() {
     const userId = await this.authService.getCurrentUserIdOrThrow()
-    const favoriteIdsPage = await this.engagementRepository.findFavoriteIdsPage(userId, pagination)
-    return {
-      items: await this.clothingCrudService.getClothesByIds(favoriteIdsPage.items),
-      hasMore: favoriteIdsPage.hasMore,
-    }
+    const favoriteIds = await this.engagementRepository.findFavoriteIds(userId)
+    return this.clothingCrudService.getClothesByIds(favoriteIds)
   }
 }

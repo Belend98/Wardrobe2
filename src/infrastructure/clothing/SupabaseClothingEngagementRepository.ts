@@ -2,7 +2,6 @@ import type {
   ClothingEngagementRepository,
   ClothingLike,
 } from '@/src/domain/repositories/ClothingEngagementRepository'
-import type { PaginatedResult, Pagination } from '@/src/domain/pagination'
 import { supabase } from '@/src/infrastructure/supabase/client'
 
 function isDuplicateError(error: unknown) {
@@ -60,26 +59,6 @@ export class SupabaseClothingEngagementRepository
     if (error) throw error
 
     return (data ?? []).map((favorite) => favorite.clothe_id)
-  }
-
-  async findFavoriteIdsPage(
-    userId: string,
-    pagination: Pagination,
-  ): Promise<PaginatedResult<string>> {
-    const { data, error } = await supabase
-      .from('clothes_favorites')
-      .select('clothe_id')
-      .eq('user_id', userId)
-      .order('clothe_id', { ascending: true })
-      .range(pagination.offset, pagination.offset + pagination.limit)
-
-    if (error) throw error
-
-    const ids = (data ?? []).map((favorite) => favorite.clothe_id)
-    return {
-      items: ids.slice(0, pagination.limit),
-      hasMore: ids.length > pagination.limit,
-    }
   }
 
   async addFavorite(clotheId: string, userId: string): Promise<void> {

@@ -39,7 +39,7 @@ export function usePersonalActions() {
               } catch {
                 // La session peut deja etre invalide apres suppression dans auth.users.
               }
-              Alert.alert('Compte supprime', 'Ton compte a ete supprime.')
+              Alert.alert('Compte supprime', 'Ton compte a été supprime.')
               router.replace('/(auth)/signup')
             } catch (error) {
               const message = error instanceof Error ? error.message : 'Impossible de supprimer le compte.'

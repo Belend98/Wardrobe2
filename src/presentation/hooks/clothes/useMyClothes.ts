@@ -1,17 +1,13 @@
 import { clothingCrudService } from '@/src/composition/clothing'
-import { usePaginatedClothes } from '@/src/presentation/hooks/clothes/usePaginatedClothes'
+import { useClothes } from '@/src/presentation/hooks/clothes/useClothes'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
 
 export function useMyClothes() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const loadPage = useCallback(
-    (pagination: Parameters<typeof clothingCrudService.getMyClothes>[0]) =>
-      clothingCrudService.getMyClothes(pagination),
-    [],
-  )
-  const pagination = usePaginatedClothes(loadPage)
-  const { removeClothe } = pagination
+  const loadClothes = useCallback(() => clothingCrudService.getMyClothes(), [])
+  const clothesState = useClothes(loadClothes)
+  const { removeClothe } = clothesState
 
   const deleteClothes = useCallback(async (id: string) => {
     try {
@@ -28,7 +24,7 @@ export function useMyClothes() {
   }, [removeClothe])
 
   return {
-    ...pagination,
+    ...clothesState,
     deletingId,
     deleteClothes,
   }

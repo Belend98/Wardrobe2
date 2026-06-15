@@ -3,8 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
-
-import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/infrastructure/storage/camera.service'
+import { cameraGateway } from '@/src/composition/camera'
 import { toErrorMessage } from '@/src/shared/utils/errors'
 import { CLOTHES_CATEGORIES } from '@/src/shared/constants/clothesCategories'
 import { createClotheSchema, type CreateClotheInput } from '@/src/domain/rules/clothesSchema'
@@ -85,7 +84,7 @@ export function useEditClotheForm() {
 
   const handlePickImage = async () => {
     try {
-      const media = await pickImageFromLibrary()
+      const media = await cameraGateway.pickImageFromLibrary()
       if (!media) return
 
       setImageBase64(media.base64 ?? null)
@@ -100,7 +99,7 @@ export function useEditClotheForm() {
 
   const handleTakePhoto = async () => {
     try {
-      const media = await takePhotoWithCamera()
+      const media = await cameraGateway.takePhoto()
       if (!media) return
 
       setImageBase64(media.base64 ?? null)

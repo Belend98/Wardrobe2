@@ -9,3 +9,8 @@ export type PickedMedia = {
   fileSize?: number | null
   fileName?: string | null
 }
+
+export interface CameraGateway {
+  pickImageFromLibrary(): Promise<PickedMedia | null>
+  takePhoto(): Promise<PickedMedia | null>
+}

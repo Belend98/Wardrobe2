@@ -1,6 +1,5 @@
 import type { AuthService } from '@/src/application/services/authService'
 import type { ClothesModel } from '@/src/domain/entities/ClothingItem'
-import type { PaginatedResult, Pagination } from '@/src/domain/pagination'
 import type { ClothingImageStorage } from '@/src/domain/repositories/ClothingImageStorage'
 import type {
   ClothingRepository,
@@ -51,10 +50,10 @@ export class ClothingCrudService {
     }
   }
 
-  async getMyClothes(pagination: Pagination): Promise<PaginatedResult<ClothesModel>> {
+  async getMyClothes(): Promise<ClothesModel[]> {
     const userId = await this.authService.getCurrentUserIdOrThrow()
-    const page = await this.clothingRepository.findByUserId(userId, pagination)
-    return this.resolveImagePage(page)
+    const clothes = await this.clothingRepository.findByUserId(userId)
+    return this.resolveImageUrls(clothes)
   }
 
   async getMyClotheById(id: string) {
@@ -133,9 +132,9 @@ export class ClothingCrudService {
     await this.imageStorage.delete(clothe.imageUrl)
   }
 
-  async getPublicClothes(pagination: Pagination): Promise<PaginatedResult<ClothesModel>> {
-    const page = await this.clothingRepository.findPublic(pagination)
-    return this.resolveImagePage(page)
+  async getPublicClothes(): Promise<ClothesModel[]> {
+    const clothes = await this.clothingRepository.findPublic()
+    return this.resolveImageUrls(clothes)
   }
 
   async getClothesByIds(ids: string[]) {
@@ -143,12 +142,12 @@ export class ClothingCrudService {
     return this.resolveImageUrls(clothes)
   }
 
-  async getMyAndFriendsClothes(pagination: Pagination): Promise<PaginatedResult<ClothesModel>> {
+  async getMyAndFriendsClothes(): Promise<ClothesModel[]> {
     const userId = await this.authService.getCurrentUserIdOrThrow()
     const friendIds = await this.getFriendIds()
     const userIds = Array.from(new Set([userId, ...friendIds]))
-    const page = await this.clothingRepository.findPublicByUserIds(userIds, pagination)
-    return this.resolveImagePage(page)
+    const clothes = await this.clothingRepository.findPublicByUserIds(userIds)
+    return this.resolveImageUrls(clothes)
   }
 
   private async resolveImageUrl(clothe: ClothesModel): Promise<ClothesModel> {
@@ -162,12 +161,4 @@ export class ClothingCrudService {
     return Promise.all(clothes.map((clothe) => this.resolveImageUrl(clothe)))
   }
 
-  private async resolveImagePage(
-    page: PaginatedResult<ClothesModel>,
-  ): Promise<PaginatedResult<ClothesModel>> {
-    return {
-      items: await this.resolveImageUrls(page.items),
-      hasMore: page.hasMore,
-    }
-  }
 }

@@ -1,4 +1,4 @@
-import { pickImageFromLibrary, takePhotoWithCamera } from '@/src/infrastructure/storage/camera.service'
+import { cameraGateway } from '@/src/composition/camera'
 import { toErrorMessage } from '@/src/shared/utils/errors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useState } from 'react'
@@ -42,7 +42,7 @@ export function useCreateClotheForm() {
 
   const handlePickImage = useCallback(async () => {
     try {
-      const media = await pickImageFromLibrary()
+      const media = await cameraGateway.pickImageFromLibrary()
       setSelectedImage(media)
     } catch (error) {
       Alert.alert('Erreur', toErrorMessage(error))
@@ -51,7 +51,7 @@ export function useCreateClotheForm() {
 
   const handleTakePhoto = useCallback(async () => {
     try {
-      const media = await takePhotoWithCamera()
+      const media = await cameraGateway.takePhoto()
       setSelectedImage(media)
     } catch (error) {
       Alert.alert('Erreur', toErrorMessage(error))
